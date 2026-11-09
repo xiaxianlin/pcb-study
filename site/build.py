@@ -16,6 +16,9 @@ CN_NUM = '一二三四五'
 # 课程导航次序；分阶段按章节选择的具体顺序以 README 为准。
 ORDER = [f'{n:02d}' for n in range(1, 27)]
 STAGE_BY_ID = {k: i for i, ids in enumerate(('01 02 03 04 05 06', '07 08 09 10 11 12', '13 14 15 16 17', '18 19 20 21 22', '23 24 25 26'), 1) for k in ids.split()}
+# 阶段一重构期间，phase1-new/ 下的同名编号章节优先于根目录旧章节。
+# 这样每写完一章就能在本地站点预览，不必等 8 章全部替换完。
+PHASE1_DIR = COURSE_DIR / 'phase1-new'
 
 
 def parse_lesson(path: pathlib.Path) -> dict:
@@ -59,7 +62,7 @@ def parse_lesson(path: pathlib.Path) -> dict:
     diff = meta.get('本课难度', '').count('⭐')
     prev = meta.get('前置课程', '')
 
-    short = re.sub(r'^第\s*\d+\s*课\s*·\s*', '', title)
+    short = re.sub(r'^第\s*\d+\s*[课章]\s*·\s*', '', title)
     short = re.sub(r'^项目实战\s*·\s*', '', short)
     if lesson_id in ('22', '23', '25'):
         short = re.sub(r'\s*（选学）$', '', short)
@@ -139,8 +142,17 @@ def collect_resources():
     return result
 
 
+def collect_lesson_files():
+    """收集课程文件；phase1-new/ 中同编号文件覆盖根目录旧版。"""
+    by_id = {path.name[:2]: path for path in sorted(COURSE_DIR.glob('[0-9][0-9]-*.md'))}
+    if PHASE1_DIR.is_dir():
+        for path in sorted(PHASE1_DIR.glob('[0-9][0-9]-*.md')):
+            by_id[path.name[:2]] = path
+    return [by_id[key] for key in sorted(by_id)]
+
+
 def main():
-    files = sorted(COURSE_DIR.glob('[0-9][0-9]-*.md'))
+    files = collect_lesson_files()
     if not files:
         raise SystemExit(f'未找到课程文件: {COURSE_DIR}')
     lessons = [parse_lesson(p) for p in files]
