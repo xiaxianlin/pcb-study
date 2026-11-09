@@ -59,7 +59,7 @@ def parse_lesson(path: pathlib.Path) -> dict:
         stage = 1 if lesson_id < '04' else 2 if lesson_id < '08' else 3 if lesson_id < '11' else 4 if lesson_id < '15' else 5
 
     stage = STAGE_BY_ID[lesson_id]
-    diff = meta.get('本课难度', '').count('⭐')
+    diff = (meta.get('本课难度') or meta.get('本章难度') or '').count('⭐')
     prev = meta.get('前置课程', '')
 
     short = re.sub(r'^第\s*\d+\s*[课章]\s*·\s*', '', title)
