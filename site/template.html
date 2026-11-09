@@ -1,0 +1,1199 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PCB 设计系统教学课程</title>
+<style>
+@font-face{
+  font-family:'JetBrains Mono';font-style:normal;font-weight:400;font-display:swap;
+  src:url('./fonts/jetbrains/jb-400.woff2') format('woff2');
+  unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+2000-206F,U+2074,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;
+}
+@font-face{
+  font-family:'JetBrains Mono';font-style:normal;font-weight:700;font-display:swap;
+  src:url('./fonts/jetbrains/jb-700.woff2') format('woff2');
+  unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+2000-206F,U+2074,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;
+}
+:root{
+  --bg:#f7f9fa; --bg2:#eef2f5; --panel:#ffffff; --panel2:#f2f6f8;
+  --line:#e0e7eb; --line2:#ccd7dd;
+  --text:#223039; --muted:#5a6b76; --faint:#8a99a3;
+  --green:#0e9f5f; --green-dim:#0b7a4c; --gold:#a97b1c;
+  --s1:#2f6fd6;
+  --st1:#0891a5; --st2:#2f6fd6; --st3:#0e9f5f; --st4:#e07c24; --st5:#7c5cd6;
+  --btn-text:#ffffff; --strong:#111f19;
+  --code-bg:#f4f8f5; --code-text:#24413a; --dot:rgba(0,0,0,.09);
+  --shadow:0 12px 30px rgba(20,40,32,.14);
+  --bq-bg:rgba(169,123,28,.08);
+  --mono:'JetBrains Mono',ui-monospace,'SF Mono',SFMono-Regular,Menlo,Consolas,'Sarasa Mono SC',monospace;
+}
+html[data-theme='dark']{
+  --bg:#0a0f0d; --bg2:#0d1512; --panel:#111b17; --panel2:#152019;
+  --line:#1f2f28; --line2:#2a3d34;
+  --text:#dbe7e1; --muted:#8aa097; --faint:#5c7168;
+  --green:#34e08a; --green-dim:#1d7a4e; --gold:#d8b45a;
+  --s1:#5aa9ff;
+  --st1:#56c8d8; --st2:#5aa9ff; --st3:#34e08a; --st4:#ffa04d; --st5:#b78cff;
+  --btn-text:#06130c; --strong:#ffffff;
+  --code-bg:#0b1210; --code-text:#b9d4c6; --dot:rgba(139,160,151,.14);
+  --shadow:0 12px 30px rgba(0,0,0,.5);
+  --bq-bg:rgba(216,180,90,.05);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);
+  font:500 15px/1.75 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue","Noto Sans",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
+  -webkit-font-smoothing:antialiased}
+a{color:var(--s1);text-decoration:none}
+a:hover{text-decoration:underline}
+
+.app{display:flex;min-height:100vh}
+
+/* ---------- sidebar ---------- */
+.sidebar{width:290px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--line);
+  position:sticky;top:0;height:100vh;overflow-y:auto;display:flex;flex-direction:column;z-index:30}
+.brand{padding:20px 20px 14px;border-bottom:1px solid var(--line)}
+.brand .logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:17px;letter-spacing:.5px}
+#themeBtn{margin-left:auto;background:var(--panel2);border:1px solid var(--line2);border-radius:8px;
+  width:30px;height:30px;cursor:pointer;font-size:14px;line-height:1;flex-shrink:0;padding:0}
+#themeBtn:hover{border-color:var(--faint)}
+.brand .dot{width:26px;height:26px;border-radius:50%;background:
+  radial-gradient(circle at center, var(--bg) 0 7px, var(--green) 7px 10px, var(--bg2) 10px);
+  border:2px solid var(--green);flex-shrink:0}
+.brand .sub{margin-top:6px;font-size:12px;color:var(--faint)}
+.search-wrap{padding:12px 14px;position:relative}
+.search-box{display:flex;align-items:center;gap:8px;background:var(--panel);border:1px solid var(--line);
+  border-radius:8px;padding:7px 10px}
+.search-box input{flex:1;background:none;border:0;outline:0;color:var(--text);font-size:13px;min-width:0}
+.search-box .ic{color:var(--faint);font-size:13px;cursor:default}
+.search-results{position:absolute;left:14px;right:14px;top:52px;background:var(--panel);
+  border:1px solid var(--line2);border-radius:10px;box-shadow:var(--shadow);
+  max-height:380px;overflow-y:auto;display:none;z-index:50}
+.search-results.show{display:block}
+.sr-item{padding:10px 12px;border-bottom:1px solid var(--line);cursor:pointer}
+.sr-item:last-child{border-bottom:0}
+.sr-item:hover{background:var(--panel)}
+.sr-item .t{font-size:13.5px;font-weight:600}
+.sr-item .s{font-size:12px;color:var(--muted);margin-top:2px;line-height:1.5}
+.sr-item .s b{color:var(--gold);font-weight:600}
+.sr-empty{padding:14px;font-size:13px;color:var(--faint)}
+nav#nav{flex:1;padding:6px 10px 14px}
+.stage-group{margin-top:12px}
+.stage-head{display:flex;align-items:center;gap:8px;padding:4px 10px;font-size:12.5px;color:var(--muted);letter-spacing:.5px}
+.stage-head .sdot{width:8px;height:8px;border-radius:50%;background:var(--c)}
+.stage-head .cnt{margin-left:auto;font-size:11.5px;color:var(--faint)}
+.lesson-item{display:flex;align-items:center;gap:9px;padding:7px 10px;border-radius:8px;cursor:pointer;
+  color:var(--text);font-size:13.5px;border:1px solid transparent}
+.lesson-item:hover{background:var(--panel)}
+.lesson-item.active{background:var(--panel2);border-color:var(--line2)}
+.lesson-item .no{font-family:var(--mono);font-size:12px;color:var(--faint);width:20px;flex-shrink:0}
+.lesson-item .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lesson-item .hr{font-size:11px;color:var(--faint);font-family:var(--mono)}
+.lesson-item .ok{color:var(--green);font-size:13px;width:16px;text-align:center;flex-shrink:0}
+.lesson-item.done .nm{color:var(--muted)}
+.side-foot{border-top:1px solid var(--line);padding:14px 18px;font-size:12px;color:var(--faint)}
+.pbar{height:6px;background:var(--panel);border-radius:99px;overflow:hidden;margin:8px 0}
+.pbar i{display:block;height:100%;background:linear-gradient(90deg,var(--green-dim),var(--green));border-radius:99px;transition:width .4s}
+.side-foot .row{display:flex;justify-content:space-between;align-items:center}
+.side-foot .pct{color:var(--green);font-family:var(--mono)}
+.reset-link{color:var(--faint);cursor:pointer}
+.reset-link:hover{color:var(--s3);text-decoration:underline}
+.side-foot .tip{margin-top:8px;line-height:1.6;font-size:11.5px}
+.progress-tools{display:flex;gap:8px;flex-wrap:wrap;margin-top:9px}
+.progress-tools button{background:var(--panel);border:1px solid var(--line2);border-radius:6px;padding:4px 8px;color:var(--text);font-size:12px;cursor:pointer}
+
+.overlay{display:none}
+.menu-btn{display:none}
+
+/* ---------- main ---------- */
+.main{flex:1;min-width:0;padding:36px 44px 90px;display:flex;justify-content:center;gap:36px;align-items:flex-start}
+.container{width:100%;max-width:940px;min-width:0}
+
+/* ---------- toc（右侧大纲） ---------- */
+.toc{display:none;position:sticky;top:36px;flex:0 0 216px;max-height:calc(100vh - 72px);overflow-y:auto;
+  padding:2px 0 20px 2px}
+@media (min-width:1380px){ .toc.has-toc{display:block} }
+.toc-title{font-size:12px;color:var(--faint);letter-spacing:1.5px;margin:0 0 10px 14px;font-weight:700}
+.toc-item{font-size:12.5px;line-height:1.45;color:var(--muted);padding:4px 8px 4px 12px;margin:1px 0;
+  border-left:2px solid transparent;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  border-radius:0 6px 6px 0;transition:color .12s}
+.toc-item.lv3{padding-left:38px;font-size:12px}
+.toc-item.lv2{padding-left:26px;font-size:12px}
+.toc-item:hover{color:var(--text);background:var(--panel)}
+.toc-item.active{color:var(--green);border-left-color:var(--green);background:var(--panel)}
+.md h2,.md h3,.md h4,.md h5,.md h6{scroll-margin-top:16px}
+
+/* ---------- sim modal（电路仿真弹窗） ---------- */
+.sim-backdrop{position:fixed;inset:0;z-index:90;background:rgba(5,12,9,.62);
+  display:flex;align-items:center;justify-content:center;padding:26px}
+.sim-backdrop[hidden]{display:none}
+.sim-panel{background:var(--panel);border:1px solid var(--line2);border-radius:14px;
+  width:min(1240px,96vw);height:min(880px,92vh);display:flex;flex-direction:column;overflow:hidden;box-shadow:var(--shadow)}
+.sim-head{display:flex;align-items:center;gap:12px;padding:12px 18px;border-bottom:1px solid var(--line);flex-shrink:0}
+.sim-head .t{font-weight:700;font-size:15.5px;white-space:nowrap}
+.sim-head .d{color:var(--faint);font-size:12.5px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sim-btn{border:1px solid var(--line2);background:var(--panel2);color:var(--text);border-radius:8px;
+  padding:6px 14px;font-size:13px;cursor:pointer;white-space:nowrap;text-decoration:none}
+.sim-btn:hover{border-color:var(--faint)}
+.sim-frame{flex:1;width:100%;border:0;background:#fff}
+
+/* 思维导图 */
+.mind-panel{width:min(1150px,96vw);height:min(720px,90vh)}
+.mind-body{flex:1;overflow:auto;padding:18px;color:var(--text)}
+.mm-link{stroke:var(--line2);stroke-width:1.5;fill:none}
+.mm-node{cursor:pointer}
+.mm-node rect{fill:var(--panel2);stroke:var(--line2)}
+.mm-node text{fill:currentColor;font-size:12.5px}
+.mm-node.l1 rect{stroke:var(--green);stroke-width:1.6}
+.mm-node.l1 text{font-weight:700}
+.mm-node.l0 rect{fill:var(--green);stroke:var(--green)}
+.mm-node.l0 text{fill:var(--btn-text);font-weight:700;font-size:13.5px}
+.mm-node:hover rect{stroke:var(--green);stroke-width:2}
+
+.hero{border:1px solid var(--line);border-radius:16px;padding:34px 36px;position:relative;overflow:hidden;
+  background:
+    radial-gradient(circle at 85% -10%, rgba(52,224,138,.08), transparent 45%),
+    radial-gradient(circle at 12% 120%, rgba(90,169,255,.07), transparent 40%),
+    var(--panel)}
+.hero::before{content:"";position:absolute;inset:0;
+  background-image:radial-gradient(var(--dot) 1px, transparent 1.4px);
+  background-size:26px 26px;pointer-events:none}
+.hero h1{margin:0 0 8px;font-size:30px;letter-spacing:.5px;position:relative}
+.hero p{margin:0;color:var(--muted);font-size:15px;position:relative}
+.hero .cta{margin-top:20px;display:flex;gap:12px;flex-wrap:wrap;position:relative}
+.btn{display:inline-flex;align-items:center;gap:8px;border-radius:10px;padding:10px 20px;font-size:14.5px;
+  cursor:pointer;border:1px solid transparent;font-weight:600}
+.btn.primary{background:var(--green);color:var(--btn-text)}
+.btn.primary:hover{filter:brightness(1.1)}
+.btn.ghost{background:transparent;color:var(--text);border-color:var(--line2)}
+.btn.ghost:hover{border-color:var(--faint)}
+.btn.done-btn{background:var(--panel2);color:var(--green);border-color:var(--green-dim)}
+.btn.done-btn:hover{filter:brightness(1.2)}
+
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:22px}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 18px}
+.stat .v{font-size:22px;font-weight:700;font-family:var(--mono)}
+.stat .v em{font-style:normal;font-size:13px;color:var(--faint);margin-left:2px}
+.stat .k{font-size:12.5px;color:var(--muted);margin-top:2px}
+.stat.g .v{color:var(--green)}
+
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;margin-top:26px;padding:24px 26px}
+.panel .panel-title{display:flex;align-items:center;gap:10px;font-size:16.5px;font-weight:700;margin:0 0 4px}
+.panel .panel-sub{color:var(--faint);font-size:12.5px;margin:0 0 12px}
+
+/* route map */
+.map-wrap{overflow-x:auto}
+svg.routemap{width:100%;min-width:640px;height:auto;display:block}
+.node{cursor:pointer}
+.node .pad{fill:var(--panel2);stroke:var(--c);stroke-width:2.5;transition:all .15s}
+.node .num{fill:var(--c);font:700 13px var(--mono);text-anchor:middle;pointer-events:none}
+.node .lbl{fill:var(--muted);font-size:11.5px;text-anchor:middle;pointer-events:none}
+.node .opt-tag{fill:var(--faint);font-size:9.5px;text-anchor:middle}
+.node.optional .pad{stroke-dasharray:5 4}
+.node:hover .pad{stroke-width:4;filter:brightness(1.25)}
+.node.done .pad{fill:var(--c)}
+.node.done .num{fill:#0a0f0d}
+.node.done .lbl{fill:var(--text)}
+.node.active .pad{stroke-width:5;filter:drop-shadow(0 0 7px var(--c))}
+.node .badge{fill:var(--green)}
+.node .badge-t{fill:var(--btn-text);font:700 10px var(--mono);text-anchor:middle}
+.seg{opacity:.45;stroke-width:3;stroke-linecap:round}
+.seg.done-seg{opacity:.85}
+.map-legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:14px;font-size:12.5px;color:var(--muted)}
+.map-legend .li{display:flex;align-items:center;gap:7px}
+.map-legend .sw{width:22px;height:4px;border-radius:99px}
+.map-legend .done-sw{width:12px;height:12px;border-radius:50%;background:var(--green);display:inline-flex;align-items:center;justify-content:center;font-size:8px;color:var(--btn-text);font-weight:800}
+
+/* stage cards */
+.stages{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.stage-card{border:1px solid var(--line);border-left:3px solid var(--c);border-radius:12px;padding:16px 18px;background:var(--panel)}
+.stage-card .h{display:flex;align-items:baseline;gap:10px}
+.stage-card .h .n{font-weight:700;font-size:15.5px;color:var(--c)}
+.stage-card .h .r{font-size:12px;color:var(--faint);font-family:var(--mono)}
+.stage-card .d{font-size:13px;color:var(--muted);margin-top:6px;line-height:1.65}
+.stage-card .mini{margin-top:10px;height:5px;background:var(--bg);border-radius:99px;overflow:hidden}
+.stage-card .mini i{display:block;height:100%;background:var(--c);border-radius:99px}
+.stage-card .mrow{display:flex;justify-content:space-between;font-size:11.5px;color:var(--faint);margin-top:6px}
+
+/* lesson view */
+.crumb{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--faint);margin-bottom:14px}
+.crumb a{color:var(--muted)}
+.crumb .stage-chip{display:inline-flex;align-items:center;gap:6px;padding:2px 11px;border-radius:99px;
+  border:1px solid var(--c);color:var(--c);font-size:12px}
+.lesson-head h1{margin:0 0 12px;font-size:26px;line-height:1.4}
+.meta-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:3px 12px;border:1px solid var(--line2);
+  border-radius:99px;color:var(--muted);font-size:12.5px}
+.chip b{color:var(--text);font-weight:600}
+.chip.task-chip{border-color:var(--green-dim)}
+.chip.task-chip b{color:var(--green)}
+.spacer{flex:1}
+
+/* markdown content */
+.md{margin-top:28px}
+.md h1{font-size:24px;margin:34px 0 14px;padding-bottom:10px;border-bottom:1px solid var(--line)}
+.md h2{font-size:21px;margin:36px 0 14px;padding-left:14px;border-left:4px solid var(--green)}
+.md h3{font-size:19px;margin:30px 0 12px;color:var(--text);font-weight:700;
+  padding-bottom:6px;border-bottom:1px dashed var(--line2)}
+.md h4{font-size:15.5px;margin:26px 0 10px;color:var(--text);font-weight:700;
+  display:inline-block;max-width:100%;padding:4px 12px;
+  background:var(--panel2);border-left:3px solid var(--green);border-radius:0 8px 8px 0}
+.md h4::before{content:"§ ";color:var(--green);font-weight:700}
+.md h5{font-size:15px;margin:22px 0 8px;color:var(--text);font-weight:700}
+.md p{margin:12px 0}
+.md strong{color:var(--strong)}
+.md code{font-family:var(--mono);font-size:.88em;background:var(--panel2);
+  border:1px solid var(--line);border-radius:5px;padding:1px 6px;color:var(--gold)}
+.md pre{background:var(--code-bg);border:1px solid var(--line);border-radius:10px;padding:16px 18px;
+  overflow-x:auto;line-height:1.55;margin:14px 0}
+.md pre code{background:none;border:0;padding:0;color:var(--code-text);font-size:12.8px;white-space:pre}
+.md blockquote{margin:14px 0;padding:10px 18px;border-left:3px solid var(--gold);
+  background:var(--bq-bg);border-radius:0 8px 8px 0;color:var(--muted)}
+.md blockquote p{margin:4px 0}
+.md ul,.md ol{margin:12px 0;padding-left:26px}
+.md li{margin:5px 0}
+.md li.sub{margin-left:20px}
+.md hr{border:0;border-top:1px dashed var(--line2);margin:26px 0}
+.md details{margin:14px 0;border:1px solid var(--line);border-radius:10px;background:var(--panel2)}
+.md details summary{cursor:pointer;padding:10px 16px;font-weight:600;user-select:none;list-style:none}
+.md details summary::-webkit-details-marker{display:none}
+.md details summary::before{content:"▸ ";color:var(--faint)}
+.md details[open] summary::before{content:"▾ ";color:var(--green)}
+.md details > *:not(summary){margin-left:16px;margin-right:16px}
+
+/* mermaid 图 / 内嵌 SVG 图 */
+.diagram{margin:14px 0;padding:12px;background:var(--panel2);border:1px solid var(--line);
+  border-radius:10px;overflow-x:auto;display:flex;justify-content:center;color:var(--text)}
+.diagram svg{max-width:100%}
+.diagram-err{font-family:var(--mono);font-size:12.5px;white-space:pre;color:var(--s3);justify-content:flex-start;display:block}
+.diagram-svg svg{max-width:100%;height:auto}
+.diagram-svg text{font-family:inherit;fill:currentColor}
+.fp-board{fill:var(--bg2);stroke:var(--line2);stroke-width:1.5}
+.fp-zone{fill:var(--panel);stroke:var(--line);stroke-dasharray:5 3}
+.fp-part{fill:var(--panel2);stroke:var(--line2)}
+.fp-core{fill:var(--panel2);stroke:var(--s4);stroke-width:2}
+.fp-rf{fill:var(--panel2);stroke:var(--s1);stroke-width:2}
+.fp-note{fill:var(--faint)}
+.fp-strong{fill:var(--text);font-weight:600}
+.wv-axis{stroke:var(--muted)}
+.wv-curve{stroke:var(--green);stroke-width:2.5;fill:none}
+.wv-dash{stroke:var(--faint);stroke-dasharray:4 4;fill:none}
+.wv-lab{fill:var(--muted)}
+.wv-em{fill:var(--gold);font-weight:600}
+.tbl-wrap{overflow-x:auto;margin:14px 0;border:1px solid var(--line);border-radius:10px}
+.md table{border-collapse:collapse;width:100%;font-size:13.5px;line-height:1.6}
+.md th{background:var(--panel2);font-weight:700;text-align:left;white-space:nowrap}
+.md th,.md td{padding:8px 14px;border-bottom:1px solid var(--line)}
+.md tr:last-child td{border-bottom:0}
+.md td{color:var(--muted)}
+.md td:first-child{color:var(--text)}
+ul.tasks{list-style:none;padding-left:4px}
+ul.tasks li{margin:8px 0}
+ul.tasks label{display:flex;gap:10px;align-items:flex-start;cursor:pointer}
+ul.tasks input[type=checkbox]{width:16px;height:16px;margin-top:5px;accent-color:var(--green);cursor:pointer;flex-shrink:0}
+ul.tasks input:disabled{cursor:default}
+
+/* lesson bottom */
+.lesson-foot{margin-top:36px;padding-top:22px;border-top:1px solid var(--line);display:flex;gap:12px;flex-wrap:wrap}
+.nav-cards{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:18px}
+.nav-card{border:1px solid var(--line);border-radius:12px;padding:14px 18px;cursor:pointer;background:var(--panel)}
+.nav-card:hover{border-color:var(--faint)}
+.nav-card.next{text-align:right}
+.nav-card .dir{font-size:11.5px;color:var(--faint)}
+.nav-card .tt{font-size:14.5px;font-weight:600;margin-top:3px}
+.nav-card.disabled{opacity:.35;pointer-events:none}
+
+/* readme details */
+details.readme{margin-top:26px;border:1px solid var(--line);border-radius:14px;background:var(--panel)}
+details.readme summary{cursor:pointer;padding:16px 22px;font-weight:700;font-size:15.5px;list-style:none;display:flex;align-items:center;gap:10px}
+details.readme summary::before{content:"▸";color:var(--faint);transition:transform .15s}
+details.readme[open] summary::before{transform:rotate(90deg)}
+details.readme .inner{padding:4px 26px 26px}
+
+/* code / misc */
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-thumb{background:var(--line2);border-radius:99px;border:2px solid var(--bg)}
+::-webkit-scrollbar-track{background:transparent}
+
+/* responsive */
+@media (max-width:960px){
+  .main{padding:26px 18px 70px}
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .stages{grid-template-columns:1fr}
+  .sidebar{position:fixed;left:0;top:0;bottom:0;transform:translateX(-100%);transition:transform .2s;width:290px}
+  body.nav-open .sidebar{transform:translateX(0)}
+  .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:25}
+  body.nav-open .overlay{display:block}
+  .menu-btn{display:flex;position:fixed;left:14px;top:14px;z-index:40;width:40px;height:40px;
+    align-items:center;justify-content:center;border-radius:10px;border:1px solid var(--line2);
+    background:var(--panel2);color:var(--text);font-size:17px;cursor:pointer}
+  body:not(.nav-open) .main{padding-top:70px}
+  .hero{padding:26px 22px}
+  .hero h1{font-size:23px}
+  .nav-cards{grid-template-columns:1fr}
+  .nav-card.next{text-align:left}
+}
+@media print{
+  .sidebar,.menu-btn,.overlay,.lesson-foot,.crumb,.cta,.toc{display:none!important}
+  body{background:#fff;color:#000}
+  .main{padding:0;display:block}
+}
+.circuit-figure{margin:1.2em 0;padding:12px;border:1px solid var(--border);border-radius:10px;overflow:hidden}.circuit-figure figcaption{font-size:.9em;line-height:1.5;margin-bottom:8px}.circuit-figure iframe{display:block;width:100%;height:390px;border:0;background:#fff;border-radius:6px}
+</style>
+</head>
+<body>
+<div class="app">
+  <button class="menu-btn" id="menuBtn" aria-label="打开目录">☰</button>
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="logo"><span class="dot"></span>PCB 设计课程<button id="themeBtn" title="切换亮/暗主题">🌙</button></div>
+      <div class="sub">从零基础到就业 · 5 阶段 18 课</div>
+    </div>
+    <div class="search-wrap">
+      <div class="search-box">
+        <span class="ic">🔍</span>
+        <input id="searchInput" type="text" placeholder="搜索课程内容…" autocomplete="off">
+      </div>
+      <div class="search-results" id="searchResults"></div>
+    </div>
+    <nav id="nav"></nav>
+    <div class="side-foot">
+      <div class="row"><span>整体进度</span><span class="pct" id="footPct">0%</span></div>
+      <div class="pbar"><i id="footBar" style="width:0%"></i></div>
+      <div class="row"><span id="footInfo">0/18 课</span><span class="reset-link" id="resetBtn">重置进度</span></div>
+      <div class="progress-tools"><button id="exportProgress" type="button">导出进度</button><button id="importProgress" type="button">导入进度</button><input id="progressFile" type="file" accept="application/json,.json" hidden></div>
+      <div class="tip">进度保存在当前浏览器。更换设备或更新课程前，可先导出备份；导入会替换当前进度。</div>
+    </div>
+  </aside>
+  <div class="overlay" id="overlay"></div>
+  <main class="main"><div class="container" id="view"></div><aside class="toc" id="toc" aria-label="课程大纲"></aside></main>
+</div>
+<div class="sim-backdrop" id="simBackdrop" hidden>
+  <div class="sim-panel">
+    <div class="sim-head">
+      <span class="t" id="simTitle"></span>
+      <span class="d" id="simDesc"></span>
+      <a class="sim-btn" id="simNewWin" href="#" target="_blank" rel="noopener">↗ 新窗口</a>
+      <button class="sim-btn" id="simCloseBtn">✕ 关闭</button>
+    </div>
+    <iframe class="sim-frame" id="simFrame" title="电路仿真"></iframe>
+  </div>
+</div>
+<div class="sim-backdrop" id="mindBackdrop" hidden>
+  <div class="sim-panel mind-panel">
+    <div class="sim-head">
+      <span class="t" id="mindTitle">🧠 本课导图</span>
+      <span class="d">点击节点跳转到对应小节</span>
+      <button class="sim-btn" id="mindCloseBtn">✕ 关闭</button>
+    </div>
+    <div class="mind-body" id="mindBody"></div>
+  </div>
+</div>
+
+<script id="course-data" type="application/json">__COURSE_DATA_JSON__</script>
+<script src="./assets/mermaid.min.js"></script>
+<script>
+'use strict';
+/* ================= data & state ================= */
+const DATA = JSON.parse(document.getElementById('course-data').textContent);
+const LESSONS = DATA.lessons;
+const BY_ID = Object.fromEntries(LESSONS.map(l => [l.id, l]));
+const RESOURCES = DATA.resources || [];
+const RESOURCE_BY_ID = Object.fromEntries(RESOURCES.map(r => [r.id, r]));
+const CN = '一二三四五';
+const STAGES = [
+  {i:1, name:'电学、器件与测量', range:'01–06', color:'var(--st1)', desc:'电学、常见电路、器件识别与基础测量。'},
+  {i:2, name:'EDA 与基础制作', range:'07–12', color:'var(--st2)', desc:'学习 EDA、焊接、PCB、电源、接口、时钟与复位。'},
+  {i:3, name:'单片机与首板', range:'13–17', color:'var(--st3)', desc:'学习单片机，完成教学板设计、测试与开源工程解读。'},
+  {i:4, name:'多层板与专项', range:'18–22', color:'var(--st4)', desc:'学习存储、回流与信号完整性，按条件开展多层板项目。'},
+  {i:5, name:'选修与职业', range:'23–26', color:'var(--st5)', desc:'选择维修、职业准备、认证和学习资源。'}
+];
+// Keep earlier edition records and migrate into separate v3 keys.
+const P_KEY = 'pcbcourse.v4.progress', C_KEY = 'pcbcourse.v4.checks';
+const oldToNew = {'01':'01','02':'02','03':'03','04':'05','05':'07','06':'09','07':'10','08':'11','09':'18','10':'12','11':'14','12':'20','13':'21','14':'22','15':'19','16':'15','17':'24','18':'25','19':'26','20':'08','21':'16','22':'17','23':'04','24':'23'};
+function readStored(key, fallback){
+  try { const raw = localStorage.getItem(key); return raw === null ? fallback : JSON.parse(raw); }
+  catch (_) { return fallback; }
+}
+function migrateRecords(){
+  const swapLesson = id => id === '04' ? '05' : id === '05' ? '04' : id;
+  if (localStorage.getItem(P_KEY) === null) {
+    const hasV3 = localStorage.getItem('pcbcourse.v3.progress') !== null;
+    const hasV2 = !hasV3 && localStorage.getItem('pcbcourse.v2.progress') !== null;
+    const old = readStored(hasV3 ? 'pcbcourse.v3.progress' : hasV2 ? 'pcbcourse.v2.progress' : 'pcbcourse.progress', []);
+    const mapped = Array.isArray(old) ? old.map(id => swapLesson((hasV3 || hasV2) ? id : oldToNew[id])).filter(Boolean) : [];
+    localStorage.setItem(P_KEY, JSON.stringify([...new Set(mapped)]));
+  }
+  if (localStorage.getItem(C_KEY) === null) {
+    const hasV3 = localStorage.getItem('pcbcourse.v3.checks') !== null;
+    const hasV2 = !hasV3 && localStorage.getItem('pcbcourse.v2.checks') !== null;
+    const old = readStored(hasV3 ? 'pcbcourse.v3.checks' : hasV2 ? 'pcbcourse.v2.checks' : 'pcbcourse.checks', {}), mapped = {};
+    if (old && typeof old === 'object' && !Array.isArray(old)) {
+      for (const [id, values] of Object.entries(old)) {
+        const oldTarget = (hasV3 || hasV2) ? id : oldToNew[id];
+        if (!oldTarget || !Array.isArray(values)) continue;
+        const normalized = !hasV3 && oldTarget === '05' ? Array(21).fill(false).concat(values) : values;
+        mapped[swapLesson(oldTarget)] = normalized;
+      }
+    }
+    localStorage.setItem(C_KEY, JSON.stringify(mapped));
+  }
+}
+migrateRecords();
+const savedProgress = readStored(P_KEY, []), savedChecks = readStored(C_KEY, {});
+let progress = new Set(Array.isArray(savedProgress) ? savedProgress : []);
+let checks = savedChecks && typeof savedChecks === 'object' && !Array.isArray(savedChecks) ? savedChecks : {};
+const saveProgress = () => localStorage.setItem(P_KEY, JSON.stringify([...progress]));
+const saveChecks = () => localStorage.setItem(C_KEY, JSON.stringify(checks));
+
+const $ = s => document.querySelector(s);
+const view = $('#view');
+const stageColor = i => STAGES[i-1].color;
+const SIMS = {
+  "line-sense-equivalent": {title:"循迹传感节点的理想静态等效", lesson:"12", context:"循迹小车专题", desc:"固定电阻模拟两个假想静态工作点，不是 TCRT5000 型号模型"},
+  "tlterm": {title:"传输线端接与反射", lesson:"19", desc:"比较 75Ω 传输线的匹配、失配和不同源阻抗"},
+  "gpio-led-low": {title:"低电平点亮 LED", lesson:"13", desc:"用开关近似模拟 GPIO 输出低电平或断开"},
+  "gpio-button": {title:"下拉按键输入", lesson:"13", desc:"切换开关，观察输入节点的高低电平"},
+  "ntc-divider": {title:"NTC 分压等效", lesson:"12", desc:"下臂用固定电阻代表某一温度下的 NTC 阻值"},
+  "rc-lowpass-159": {title:"RC 低通：10kΩ 与 100nF", lesson:"05", desc:"1V 峰值正弦、约 159Hz；比较输入与输出"},
+  "rc-lowpass-1592": {title:"RC 低通：1kΩ 与 100nF", lesson:"06", desc:"1V 峰值正弦、约 1.59kHz；比较输入与输出"},
+  'ohms':            {title:'欧姆定律演示',    lesson:'01', desc:'调整电源电压或编辑电阻，观察电流与功率'},
+  'res-series':      {title:'电阻串联',        lesson:'02', desc:'观察串联电阻与两端电压'},
+  'voltdivide':      {title:'分压电路',        lesson:'02', desc:'上下两臂阻值之比决定输出电压'},
+  'wheatstone':      {title:'惠斯通电桥',      lesson:'02', desc:'观察中点间理想电流表；失衡时显示的是桥支电流'},
+  'capac':           {title:'RC 充放电',       lesson:'03', desc:'打开示波器，亲眼看时间常数 τ 的充电节奏'},
+  'inductkick':      {title:'电感断开尖峰',    lesson:'03', desc:'开关断开瞬间的反电动势高压毛刺'},
+  'inductkick-snub': {title:'尖峰抑制（缓冲）', lesson:'03', desc:'加入缓冲/续流路径，吸收电感尖峰'},
+  'conv-buck':       {title:'Buck 降压变换器', lesson:'10', desc:'开关节点方波与电感电流三角波'},
+  'rectify':         {title:'二极管整流',      lesson:'10', desc:'AC 变脉动直流的第一步（弱电演示）'},
+  "led-resistor": {title:"LED 与限流电阻", lesson:"04", desc:"观察 5V 电源、LED 与限流电阻组成的闭合回路"},
+  "rc-charge": {title:"电容充放电", lesson:"04", desc:"切换开关，观察电容电压随时间变化"},
+  "inductor-basic": {title:"电感电流建立", lesson:"04", desc:"切换开关，观察线圈电流变化"},
+  "diode-forward": {title:"二极管正向导通", lesson:"04", desc:"观察二极管极性及串联限流支路"},
+  "npn-switch": {title:"NPN 低边开关", lesson:"04", desc:"点击开关改变基极驱动，观察集电极负载通路"},
+  "pnp-switch": {title:"PNP 高边开关", lesson:"04", desc:"点击开关改变基极驱动，观察发射极、基极和负载"},
+  "nmos-switch": {title:"NMOS 低边开关", lesson:"04", desc:"点击开关改变栅源驱动，观察负载电流通路"},
+  "pmos-switch": {title:"PMOS 高边开关", lesson:"04", desc:"点击开关拉低栅极，观察源极、栅极上拉与负载"},
+  "opamp-buffer": {title:"运放电压跟随器", lesson:"04", desc:"比较输入与输出，观察负反馈连接"},
+  "logic-and": {title:"与门电路", lesson:"05", desc:"点击逻辑输入，观察两个条件与输出"},
+  "logic-or": {title:"或门电路", lesson:"05", desc:"点击逻辑输入，观察任一输入有效时的输出"},
+  "logic-adder": {title:"二进制加法器", lesson:"05", desc:"观察 A、B、进位输入与和位、进位输出"},
+  "logic-555": {title:"555 定时器", lesson:"05", desc:"观察电容充放电与输出波形"},
+  "level-divider": {title:"电阻分压电平转换", lesson:"05", desc:"观察串联电阻中点的输出电压"},
+  "level-nmos": {title:"双向开漏电平转换", lesson:"05", desc:"分别点击两侧开关，观察开漏拉低和两侧上拉"},
+  "opamp-noninvert": {title:"同相运放", lesson:"05", desc:"比较输入输出波形并识别反馈电阻"},
+  "opamp-invert": {title:"反相运放", lesson:"05", desc:"观察反相输出及输入、反馈电阻"},
+  "power-buck": {title:"Buck 降压", lesson:"05", desc:"开环教学模型：观察开关、电感、续流和输出，注意启动瞬态"},
+  "power-boost": {title:"Boost 升压", lesson:"05", desc:"观察电感储能、开关和输出变化"},
+  "power-invert": {title:"反相 Buck-Boost", lesson:"05", desc:"观察负输出与电感、开关的连接"},
+  "transformer-basic": {title:"变压器感应", lesson:"05", desc:"观察两个绕组和初次级电压；模型仅用于理解"},
+  "logic-mux": {title:"两路数据选择器", lesson:"05", desc:"切换选择输入和两路数据，观察输出"},
+  "logic-dff": {title:"D 触发器", lesson:"05", desc:"切换 D 并观察时钟边沿与 Q 的变化"},
+  "logic-counter": {title:"四位计数与分频", lesson:"05", desc:"观察输入时钟与各位输出；手动测试副本在下降沿计数"},
+  "analog-rc-lowpass": {title:"RC 低通滤波", lesson:"05", desc:"观察输入扫频，比较输入和输出波形"},
+  "power-linear-principle": {title:"线性稳压工作原理", lesson:"05", desc:"理想化分立调整管与反馈环路，不代表特定 LDO 型号"},
+  "analog-comparator": {title:"电压比较原理", lesson:"05", desc:"理想开环放大器近似比较行为，不是实际比较器型号模型"},
+  "analog-summer": {title:"运放求和电路", lesson:"05", desc:"观察多路输入经电阻求和与反相输出"},
+  "level-collector": {title:"NPN 开集电极电平转换", lesson:"05", desc:"切换基极输入，观察 5V 上拉输出的反相"},
+  "power-diode-or": {title:"双电源二极管 OR", lesson:"05", desc:"观察两个电源经二极管汇合及输出压降"},
+  "power-sepic": {title:"SEPIC 非反相升降压", lesson:"05", desc:"开环 SEPIC 模型，调节占空比观察输出；与四开关拓扑不同"}
+};
+const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const stars = n => '⭐'.repeat(n) + '☆'.repeat(Math.max(0, 5 - n));
+
+/* ================= markdown renderer ================= */
+function inline(s){
+  s = esc(s);
+  s = s.replace(/`([^`]+)`/g, (m,c) => '<code>'+c+'</code>');
+  s = s.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+  s = s.replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, (m,t,u) =>
+    '<a href="'+u+'"'+(u.startsWith('#') ? '' : ' target="_blank" rel="noopener"')+'>'+t+'</a>');
+  return s;
+}
+
+function mdToHtml(md, opts){
+  opts = opts || {};
+  let taskIdx = 0, hid = 0;
+  const lines = md.split('\n');
+  let out = '', i = 0;
+  const isHr = s => /^\s*(-{3,}|\*{3,}|_{3,})\s*$/.test(s);
+  const isTableSep = s => /^\s*\|?[\s:|-]*-[\s:|-]*\|?\s*$/.test(s) && s.includes('-') && s.includes('|');
+
+  while (i < lines.length){
+    const line = lines[i];
+
+    /* fenced code / mermaid 图 */
+    if (/^\s*```/.test(line)){
+      const lang = line.replace(/^\s*```/, '').trim().toLowerCase();
+      let buf = []; i++;
+      while (i < lines.length && !/^\s*```/.test(lines[i])){ buf.push(lines[i]); i++; }
+      i++;
+      if (lang === 'circuitjs'){
+        const name = buf.join('\n').trim(), sim = SIMS[name];
+        if (sim && /^[a-z0-9-]+$/.test(name)) {
+          const circuitUrl = new URL('sim/circuits/' + name + '.txt?v=20261102-orfix', location.href).href;
+          const simUrl = 'sim/circuitjs.html?lang=en&startCircuitLink=' + encodeURIComponent(circuitUrl);
+          out += '<figure class="circuit-figure"><figcaption><strong>原理图与互动仿真：'+esc(sim.title)+'</strong> · '+esc(sim.desc)+'；仿真参数可能与正文算例不同，模拟器菜单为英文。 <a href="#/sim/'+name+'">放大查看</a></figcaption><iframe loading="lazy" title="'+esc(sim.title)+' 原理图与互动仿真" src="'+esc(simUrl)+'"></iframe></figure>';
+        } else out += '<p>仿真未配置：'+esc(name)+'</p>';
+      } else if (lang === 'mermaid'){
+        out += '<div class="diagram">' + esc(buf.join('\n')) + '</div>';
+      } else if (lang === 'svg'){
+        out += '<div class="diagram diagram-svg">' + buf.join('\n') + '</div>';
+      } else {
+        out += '<pre><code>' + esc(buf.join('\n')) + '</code></pre>';
+      }
+      continue;
+    }
+    /* details / summary 折叠块透传 */
+    if (/^\s*<details[^>]*>\s*$/.test(line)){ out += '<details>'; i++; continue; }
+    const sm = line.match(/^\s*-?\s*<summary>(.*?)<\/summary>\s*$/);
+    if (sm){ out += '<summary>' + inline(sm[1]) + '</summary>'; i++; continue; }
+    if (/^\s*<\/details>\s*$/.test(line)){ out += '</details>'; i++; continue; }
+    /* heading */
+    let m = line.match(/^(#{1,6})\s+(.*)$/);
+    if (m){
+      const lv = Math.min(Math.max(m[1].length, 2), 6);
+      out += '<h'+lv+' id="hd-'+(hid++)+'">' + inline(m[2]) + '</h'+lv+'>';
+      i++; continue;
+    }
+    /* hr */
+    if (isHr(line)){ out += '<hr>'; i++; continue; }
+    /* blockquote */
+    if (/^\s*>/.test(line)){
+      let buf = [];
+      while (i < lines.length && /^\s*>/.test(lines[i])){ buf.push(lines[i].replace(/^\s*>\s?/,'')); i++; }
+      out += '<blockquote>' + buf.map(b => '<p>'+inline(b)+'</p>').join('') + '</blockquote>';
+      continue;
+    }
+    /* table */
+    if (line.includes('|') && i + 1 < lines.length && isTableSep(lines[i+1])){
+      const parseRow = s => s.replace(/^\s*\|/,'').replace(/\|\s*$/,'').split('|').map(c => c.trim());
+      const heads = parseRow(line);
+      const aligns = parseRow(lines[i+1]).map(c =>
+        /^:.*:$/.test(c) ? 'center' : /:$/.test(c) ? 'right' : 'left');
+      i += 2;
+      let rows = [];
+      while (i < lines.length && lines[i].includes('|') && lines[i].trim() !== ''){
+        rows.push(parseRow(lines[i])); i++;
+      }
+      let t = '<div class="tbl-wrap"><table><thead><tr>';
+      heads.forEach((h,ci) => t += '<th style="text-align:'+aligns[ci]+'">'+inline(h)+'</th>');
+      t += '</tr></thead><tbody>';
+      rows.forEach(r => {
+        t += '<tr>';
+        r.forEach((c,ci) => t += '<td style="text-align:'+(aligns[ci]||'left')+'">'+inline(c)+'</td>');
+        t += '</tr>';
+      });
+      t += '</tbody></table></div>';
+      out += t;
+      continue;
+    }
+    /* task list item */
+    m = line.match(/^(\s*)-\s+\[([ xX])\]\s+(.*)$/);
+    if (m){
+      let items = [];
+      while (i < lines.length){
+        const mm = lines[i].match(/^(\s*)-\s+\[([ xX])\]\s+(.*)$/);
+        if (!mm) break;
+        items.push({ind: mm[1].length, checked: mm[2].toLowerCase()==='x', text: mm[3]});
+        i++;
+      }
+      out += '<ul class="tasks">' + items.map(it => {
+        const ti = taskIdx++;
+        const dis = opts.staticTasks ? ' disabled' : '';
+        const ck = it.checked || (checks[opts.lessonId] && checks[opts.lessonId][ti]);
+        return '<li><label><input type="checkbox" data-ti="'+ti+'"'+dis+(ck?' checked':'')+'><span>'+inline(it.text)+'</span></label></li>';
+      }).join('') + '</ul>';
+      continue;
+    }
+    /* list */
+    m = line.match(/^(\s*)([-*]|\d+\.)\s+(.*)$/);
+    if (m){
+      const buf = [];
+      while (i < lines.length){
+        const mm = lines[i].match(/^(\s*)([-*]|\d+\.)\s+(.*)$/);
+        if (!mm) break;
+        buf.push({ind: mm[1].length, ol: /\d/.test(mm[2][0]), text: mm[3]});
+        i++;
+      }
+      let html = '', openTag = null;
+      buf.forEach(it => {
+        const tag = it.ol ? 'ol' : 'ul';
+        if (tag !== openTag){
+          if (openTag) html += '</'+openTag+'>';
+          html += '<'+tag+'>'; openTag = tag;
+        }
+        html += '<li'+(it.ind >= 2 ? ' class="sub"' : '')+'>' + inline(it.text) + '</li>';
+      });
+      if (openTag) html += '</'+openTag+'>';
+      out += html;
+      continue;
+    }
+    /* blank */
+    if (line.trim() === ''){ i++; continue; }
+    /* paragraph */
+    let para = [line];
+    i++;
+    while (i < lines.length && lines[i].trim() !== '' && !/^\s*(#{1,6}\s|```|>|\||-\s|\d+\.\s)/.test(lines[i]) && !isHr(lines[i])){
+      para.push(lines[i]); i++;
+    }
+    out += '<p>' + para.map(inline).join('<br>') + '</p>';
+  }
+  return out;
+}
+
+/* ================= sidebar ================= */
+function renderSidebar(activeId){
+  const nav = $('#nav');
+  let html = '';
+  STAGES.forEach(st => {
+    const ls = LESSONS.filter(l => l.stage === st.i);
+    const done = ls.filter(l => progress.has(l.id)).length;
+    html += '<div class="stage-group"><div class="stage-head" style="--c:'+st.color+'">' +
+      '<span class="sdot"></span>阶段'+ CN[st.i-1] +' · '+st.name+'<span class="cnt">'+done+'/'+ls.length+'</span></div>';
+    ls.forEach(l => {
+      html += '<div class="lesson-item'+(l.id===activeId?' active':'')+(progress.has(l.id)?' done':'')+'" data-id="'+l.id+'">' +
+        '<span class="no">'+l.id+'</span><span class="nm" title="'+esc(l.title)+'">'+esc(l.short)+(l.optional?'（选学）':'')+'</span>' +
+        '<span class="ok">'+(progress.has(l.id)?'✓':'')+'</span></div>';
+    });
+    html += '</div>';
+  });
+  nav.innerHTML = html;
+  nav.querySelectorAll('.lesson-item').forEach(el =>
+    el.addEventListener('click', () => { location.hash = '#/lesson/' + el.dataset.id; document.body.classList.remove('nav-open'); }));
+  updateFooter();
+}
+
+function updateFooter(){
+  const done = LESSONS.filter(l => progress.has(l.id)).length;
+  const pct = Math.round(done / LESSONS.length * 100);
+  $('#footPct').textContent = pct + '%';
+  $('#footBar').style.width = pct + '%';
+  $('#footInfo').textContent = done + '/' + LESSONS.length + ' 课';
+}
+
+/* ================= home ================= */
+function mapGeometry(){
+  const perRow = 4, x0 = 92, y0 = 82, dx = 188, dy = 148;
+  const rows = Math.ceil(LESSONS.length / perRow);
+  return { pos(i){
+    const row = Math.floor(i / perRow);
+    let col = i % perRow;
+    if (row % 2 === 1) col = perRow - 1 - col;
+    return {x: x0 + col*dx, y: y0 + row*dy};
+  }, w: x0 + 3*dx + 92, h: y0 + (rows - 1)*dy + 96 };
+}
+
+function renderHome(){
+  const done = LESSONS.filter(l => progress.has(l.id));
+  const pct = Math.round(done.length / LESSONS.length * 100);
+  const nextL = LESSONS.find(l => !progress.has(l.id)) || LESSONS[0];
+  const allDone = done.length === LESSONS.length;
+  const cta = allDone ? '🏅 全部完成，回顾课程' : (done.length === 0 ? '开始学习第 01 课' : '继续学习：' + nextL.short);
+
+  let html = `
+  <section class="hero">
+    <h1>PCB 设计系统教学课程</h1>
+    <p>从电学基础到设计与验证的学习路径 · ${STAGES.length} 阶段 ${LESSONS.length} 课 · 学习进度自动保存在本浏览器</p>
+    <div class="cta">
+      <button class="btn primary" id="ctaBtn">▶ ${cta}</button>
+      <a class="btn ghost" href="#readme-sec" onclick="document.getElementById('readme-sec').open=true">课程说明</a>
+    </div>
+  </section>
+
+  <section class="stats">
+    <div class="stat"><div class="v">${LESSONS.length}<em>课</em></div><div class="k">课程总数</div></div>
+    <div class="stat g"><div class="v">${done.length}<em>/ ${LESSONS.length}</em></div><div class="k">已完成课程 · ${pct}%</div></div>
+  </section>
+
+  ${RESOURCES.length ? `<section class="panel"><h2 class="panel-title">📚 实践专题与配套资料</h2><p class="panel-sub">独立资料不改变原有课程编号和学习进度。实物结果请按各项目记录。</p><div class="md">${['基础练习','首块 LED 练习板','纯硬件循迹小车','STM32 工程资料','审核与实施记录'].map(group => {
+    const items = RESOURCES.filter(r => r.group === group);
+    return items.length ? '<h3>'+esc(group)+'</h3><ul>'+items.map(r => '<li><a href="#/resource/'+r.id+'">'+esc(r.title)+'</a></li>').join('')+'</ul>' : '';
+  }).join('')}</div></section>` : ''}
+
+  <section class="panel">
+    <h2 class="panel-title">🗺 学习路线图</h2>
+    <p class="panel-sub">导航按推荐首次接触顺序排列；部分课程分阶段学习，具体顺序与先修关系见课程说明 · 虚线为选学</p>
+    <div class="map-wrap" id="mapWrap"></div>
+    <div class="map-legend">
+      ${STAGES.map(s => '<span class="li"><span class="sw" style="background:'+s.color+'"></span>阶段'+CN[s.i-1]+' · '+s.name+'</span>').join('')}
+      <span class="li"><span class="done-sw">✓</span>已完成</span>
+      <span class="li">┄ 选学</span>
+    </div>
+  </section>
+
+  <section class="panel"><h2 class="panel-title">五大阶段</h2><p class="panel-sub">每个阶段结束的验收标志写在 README</p>
+    <div class="stages">${STAGES.map(s => {
+      const ls = LESSONS.filter(l => l.stage === s.i);
+      const dn = ls.filter(l => progress.has(l.id)).length;
+      return `<div class="stage-card" style="--c:${s.color}">
+        <div class="h"><span class="n">阶段${CN[s.i-1]} · ${s.name}</span><span class="r">${s.range}</span></div>
+        <div class="d">${s.desc}</div>
+        <div class="mini"><i style="width:${ls.length ? Math.round(dn/ls.length*100) : 0}%"></i></div>
+        <div class="mrow"><span>${ls.map(l => l.id).join(' / ')} 课</span><span>${dn}/${ls.length} 完成</span></div>
+      </div>`;
+    }).join('')}</div>
+  </section>
+
+  <details class="readme" id="readme-sec">
+    <summary>📄 课程说明与学习方法（README）</summary>
+    <div class="inner md">${mdToHtml(DATA.readmeMd, {staticTasks:true})}</div>
+  </details>`;
+
+  view.innerHTML = html;
+  $('#ctaBtn').addEventListener('click', () => { location.hash = '#/lesson/' + nextL.id; });
+  buildMap();
+  clearToc();
+}
+
+function renderResource(id){
+  const resource = RESOURCE_BY_ID[id];
+  if (!resource){ renderHome(); return; }
+  view.innerHTML = '<div class="crumb"><a href="#/home">← 学习路线</a><span> / </span><span>'+esc(resource.group)+'</span></div>' +
+    '<div class="lesson-head"><h1>'+esc(resource.title)+'</h1></div>' +
+    '<article class="md">'+mdToHtml(resource.md.replace(/^# [^\n]*(?:\n|$)/, ''), {staticTasks:true})+'</article>';
+  clearToc();
+}
+
+function buildMap(){
+  const g = mapGeometry();
+  let svg = '<svg class="routemap" viewBox="0 0 '+g.w+' '+g.h+'" xmlns="http://www.w3.org/2000/svg">';
+  /* connectors */
+  for (let k = 0; k < LESSONS.length - 1; k++){
+    const a = g.pos(k), b = g.pos(k+1), l = LESSONS[k+1];
+    const bothDone = progress.has(LESSONS[k].id) && progress.has(l.id);
+    svg += '<line class="seg'+(bothDone?' done-seg':'')+'" x1="'+a.x+'" y1="'+a.y+'" x2="'+b.x+'" y2="'+b.y+'" style="stroke:'+stageColor(l.stage)+'"/>';
+  }
+  /* nodes */
+  LESSONS.forEach((l, k) => {
+    const p = g.pos(k), c = stageColor(l.stage), isDone = progress.has(l.id);
+    const isActive = location.hash === '#/lesson/' + l.id;
+    svg += '<g class="node'+(isDone?' done':'')+(isActive?' active':'')+(l.optional?' optional':'')+'" '+
+      'style="--c:'+c+'" transform="translate('+p.x+','+p.y+')" data-id="'+l.id+'">' +
+      '<circle class="pad" r="24"/><text class="num" y="4.5">'+l.id+'</text>' +
+      (isDone ? '<circle class="badge" cx="18" cy="-18" r="8"/><text class="badge-t" x="18" y="-14.5">✓</text>' : '') +
+      '<text class="lbl" y="46">'+esc(l.short)+'</text>' +
+      (l.optional ? '<text class="opt-tag" y="61">选学</text>' : '') +
+      '<title>第 '+l.id+' 课 · '+esc(l.title)+'\n难度 '+stars(l.diff)+(isDone?'\n✓ 已完成':'')+'</title></g>';
+  });
+  svg += '</svg>';
+  const wrap = $('#mapWrap');
+  wrap.innerHTML = svg;
+  wrap.querySelectorAll('.node').forEach(el =>
+    el.addEventListener('click', () => { location.hash = '#/lesson/' + el.dataset.id; }));
+}
+
+/* ================= lesson ================= */
+function renderLesson(id){
+  const l = BY_ID[id];
+  if (!l){ location.hash = '#/home'; return; }
+  const idx = LESSONS.indexOf(l);
+  const prev = LESSONS[idx-1], nxt = LESSONS[idx+1];
+  const isDone = progress.has(id);
+  const st = STAGES[l.stage-1];
+  const total = (l.md.match(/^- \[ \]/gm) || []).length;
+  const doneCk = (checks[id] || []).filter(Boolean).length;
+
+  view.innerHTML = `
+  <div class="lesson-head">
+    <div class="crumb">
+      <a href="#/home">‹ 路线图</a>
+      <span class="stage-chip" style="--c:${st.color}">阶段${CN[l.stage-1]} · ${st.name}</span>
+      <span class="spacer"></span>
+      <span style="font-family:var(--mono)">←/→ 切换课程</span>
+    </div>
+    <h1>第 ${l.id} 课 · ${esc(l.title.replace(/^第\s*\d+\s*课\s*·\s*/,''))}</h1>
+    <div class="meta-row">
+      <span class="chip">难度 <b>${stars(l.diff)}</b></span>
+      ${l.prev ? '<span class="chip">前置 · '+esc(l.prev)+'</span>' : ''}
+      ${total ? '<span class="chip task-chip">自测 <b id="taskChip">'+doneCk+'/'+total+'</b></span>' : ''}
+      ${l.optional ? '<span class="chip" style="border-style:dashed">选学</span>' : ''}
+      <span class="spacer"></span>
+      <button class="btn ghost" id="mindBtn">🧠 导图</button>
+      <button class="btn ${isDone?'done-btn':'primary'}" id="doneBtn">${isDone?'✓ 已完成':'标记本课完成'}</button>
+    </div>
+  </div>
+  <article class="md" id="mdBody">${mdToHtml(l.md, {lessonId:id})}</article>
+  <div class="lesson-foot">
+    <button class="btn ${isDone?'done-btn':'primary'}" id="doneBtn2">${isDone?'✓ 已完成（点击取消）':'标记本课完成'}</button>
+  </div>
+  <div class="nav-cards">
+    <div class="nav-card ${prev?'':'disabled'}" ${prev?('data-id="'+prev.id+'"'):''}>
+      <div class="dir">← 上一课${prev?'':'（无）'}</div><div class="tt">${prev ? esc(prev.short) : '—'}</div>
+    </div>
+    <div class="nav-card next" ${nxt?('data-id="'+nxt.id+'"'):''}>
+      <div class="dir">${nxt?'下一课 →':'已是最后一课'}</div><div class="tt">${nxt ? esc(nxt.short) : '🏅 前往路线图回顾'}</div>
+    </div>
+  </div>`;
+
+  /* checkbox persistence */
+  view.querySelectorAll('input[data-ti]').forEach(inp => {
+    inp.addEventListener('change', () => {
+      checks[id] = checks[id] || [];
+      checks[id][+inp.dataset.ti] = inp.checked;
+      saveChecks();
+      const all = view.querySelectorAll('input[data-ti]');
+      const dn = [...all].filter(x => x.checked).length;
+      const chip = $('#taskChip');
+      if (chip) chip.textContent = dn + '/' + all.length;
+    });
+  });
+  /* complete toggle */
+  const toggle = () => {
+    if (progress.has(id)) progress.delete(id); else progress.add(id);
+    saveProgress();
+    renderSidebar(id);
+    const dn = progress.has(id);
+    [$('#doneBtn'), $('#doneBtn2')].forEach(b => {
+      if (!b) return;
+      b.className = 'btn ' + (dn ? 'done-btn' : 'primary');
+      b.textContent = b.id === 'doneBtn' ? (dn ? '✓ 已完成' : '标记本课完成') : (dn ? '✓ 已完成（点击取消）' : '标记本课完成');
+    });
+    if (dn && nxt) setTimeout(() => { location.hash = '#/lesson/' + nxt.id; }, 350);
+  };
+  $('#doneBtn').addEventListener('click', toggle);
+  $('#doneBtn2').addEventListener('click', toggle);
+  $('#mindBtn').addEventListener('click', openMind);
+  view.querySelectorAll('.nav-card[data-id]').forEach(el =>
+    el.addEventListener('click', () => { location.hash = '#/lesson/' + el.dataset.id; }));
+  if (!nxt){
+    const last = view.querySelector('.nav-card.next');
+    if (last) last.addEventListener('click', () => { location.hash = '#/home'; });
+  }
+  buildToc();
+}
+
+/* ================= toc（右侧大纲） ================= */
+let tocHeads = [];
+function buildToc(){
+  const toc = $('#toc');
+  const heads = [...view.querySelectorAll('.md h2, .md h3, .md h4')].filter(h => h.tagName !== 'H4' || (/^04\.4\.[1-7]\s/.test(h.textContent) && location.hash === '#/lesson/04'));
+  if (!heads.length){ clearToc(); return; }
+  toc.classList.add('has-toc');
+  toc.innerHTML = '<div class="toc-title">本课大纲</div>' + heads.map(h =>
+    '<div class="toc-item '+(h.tagName === 'H2' ? 'lv1' : h.tagName === 'H4' ? 'lv3' : 'lv2')+'" data-t="'+h.id+'">'+esc(h.textContent)+'</div>').join('');
+  const els = [...toc.querySelectorAll('.toc-item')];
+  tocHeads = heads.map((h, k) => ({el: h, link: els[k]}));
+  els.forEach(el => el.addEventListener('click', () => {
+    const t = document.getElementById(el.dataset.t);
+    if (t) t.scrollIntoView({behavior: 'smooth', block: 'start'});
+  }));
+  updateTocActive();
+}
+function clearToc(){
+  const toc = $('#toc');
+  toc.classList.remove('has-toc');
+  toc.innerHTML = '';
+  tocHeads = [];
+}
+function updateTocActive(){
+  if (!tocHeads.length) return;
+  let cur = 0;
+  for (let k = 0; k < tocHeads.length; k++){
+    if (tocHeads[k].el.getBoundingClientRect().top <= 110) cur = k;
+  }
+  tocHeads.forEach((t, k) => t.link.classList.toggle('active', k === cur));
+}
+window.addEventListener('scroll', updateTocActive, {passive: true});
+
+/* ================= mermaid 图渲染 ================= */
+let diagSeq = 0;
+const MMD_LIGHT = { primaryColor:'#e9f1ec', primaryBorderColor:'#5aa9ff', primaryTextColor:'#1d2b25',
+  lineColor:'#586d63', secondaryColor:'#eef4f0', tertiaryColor:'#f7faf8', fontSize:'14px' };
+const MMD_DARK = { primaryColor:'#152019', primaryBorderColor:'#5aa9ff', primaryTextColor:'#dbe7e1',
+  lineColor:'#8aa097', secondaryColor:'#111b17', tertiaryColor:'#0e1613', fontSize:'14px' };
+function renderDiagrams(){
+  const els = view.querySelectorAll('.diagram:not(.diagram-svg)');
+  if (!els.length || !window.mermaid) return;
+  const dark = document.documentElement.dataset.theme === 'dark';
+  try{
+    window.mermaid.initialize({ startOnLoad:false, theme:'base',
+      fontFamily:'-apple-system,"PingFang SC","Microsoft YaHei",sans-serif',
+      themeVariables: dark ? MMD_DARK : MMD_LIGHT });
+  }catch(e){ return; }
+  els.forEach(async el => {
+    if (el.dataset.done) return;
+    el.dataset.src = el.textContent;
+    try{
+      const {svg} = await window.mermaid.render('mmd-' + (diagSeq++), el.dataset.src);
+      el.innerHTML = svg;
+      el.dataset.done = '1';
+    }catch(err){ el.classList.add('diagram-err'); }
+  });
+}
+
+/* ================= sim（电路仿真弹窗·覆盖层，不动路由与课程 DOM） ================= */
+function openSim(name){
+  const sim = SIMS[name];
+  if (!sim) return;
+  const circuitUrl = new URL('sim/circuits/' + name + '.txt?v=20261102-orfix', location.href).href;
+  const src = '/sim/circuitjs.html?lang=en&startCircuitLink=' + encodeURIComponent(circuitUrl);
+  $('#simTitle').textContent = '🔬 ' + sim.title;
+  $('#simDesc').textContent = sim.desc + ' · ' + (sim.context || ('第 ' + sim.lesson + ' 课配套仿真')) + ' · 菜单为英文';
+  $('#simNewWin').href = src;
+  const fr = $('#simFrame');
+  fr.onload = () => {
+    /* 仿真器与主页同源：桥接 iframe 内的 ESC，焦点在仿真器里也能关闭弹窗 */
+    try { fr.contentDocument.addEventListener('keydown', ev => { if (ev.key === 'Escape') closeSim(); }); } catch (e) {}
+  };
+  fr.src = src;
+  $('#simBackdrop').hidden = false;
+  document.body.style.overflow = 'hidden';
+}
+function closeSim(){
+  $('#simBackdrop').hidden = true;
+  $('#simFrame').src = 'about:blank';
+  document.body.style.overflow = '';
+}
+$('#simCloseBtn').addEventListener('click', closeSim);
+$('#simBackdrop').addEventListener('click', e => { if (e.target.id === 'simBackdrop') closeSim(); });
+document.addEventListener('click', e => {
+  const a = e.target.closest('a[href^="#/sim/"]');
+  if (a){ e.preventDefault(); openSim(a.getAttribute('href').slice(6)); }
+});
+
+/* ================= mind（思维导图覆盖层） ================= */
+const DEPTH = {H2: 1, H3: 2, H4: 3};
+function buildMindTree(){
+  const root = {title: '', lv: 0, children: [], el: null};
+  const stack = [root];
+  view.querySelectorAll('.md h2, .md h3, .md h4').forEach(h => {
+    const lv = DEPTH[h.tagName] || 2;
+    const node = {title: h.textContent.trim(), lv, children: [], el: h};
+    while (stack.length > lv) stack.pop();
+    stack[stack.length - 1].children.push(node);
+    stack.push(node);
+  });
+  return root;
+}
+function openMind(){
+  const id = location.hash.slice(9);
+  const l = BY_ID[id];
+  if (!l) return;
+  const root = buildMindTree();
+  root.title = '第 ' + l.id + ' 课 · ' + l.short;
+  const ROW = 40, COL = 250, PAD = 24, GAPY = 8;
+  let maxDepth = 0;
+  const layout = n => {
+    maxDepth = Math.max(maxDepth, n.lv);
+    if (!n.children.length){ n.h = ROW; return n.h; }
+    let h = 0;
+    n.children.forEach(c => { h += layout(c) + GAPY; });
+    n.h = h - GAPY;
+    return n.h;
+  };
+  layout(root);
+  const height = Math.max(root.h + PAD * 2, 300);
+  const width = (maxDepth + 1) * COL + PAD * 2 + 200;
+  let svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + width + ' ' + height + '" width="' + width + '" height="' + height + '">';
+  const place = (n, x, yTop) => {
+    n.x = x; n.yc = yTop + n.h / 2;
+    if (n.children){
+      let cy = yTop;
+      n.children.forEach(c => { place(c, x + COL, cy); cy += c.h + GAPY; });
+    }
+  };
+  place(root, PAD, PAD);
+  const esc2 = s => esc(s.length > 15 ? s.slice(0, 14) + '…' : s);
+  const draw = n => {
+    const w = Math.min(n.lv === 0 ? 210 : 215, 15 * 12.5 + 20);
+    n.children.forEach(draw);
+    if (n.lv > 0)
+      svg += '<path class="mm-link" d="M ' + (n.x - COL + 205) + ' ' + n.yc +
+             ' C ' + (n.x - COL / 2) + ' ' + n.yc + ', ' + (n.x - COL / 2) + ' ' + n.yc + ', ' + n.x + ' ' + n.yc + '"/>';
+    svg += '<g class="mm-node l' + n.lv + '"' + (n.el ? ' data-t="' + n.el.id + '"' : '') + '>' +
+           '<rect x="' + n.x + '" y="' + (n.yc - 17) + '" width="' + w + '" height="34" rx="7"/>' +
+           '<text x="' + (n.x + 10) + '" y="' + (n.yc + 4.5) + '">' + esc2(n.title) + '</text></g>';
+  };
+  draw(root);
+  svg += '</svg>';
+  $('#mindBody').innerHTML = svg;
+  $('#mindBody').querySelectorAll('.mm-node[data-t]').forEach(el =>
+    el.addEventListener('click', () => {
+      closeMind();
+      const t = document.getElementById(el.dataset.t);
+      if (t) t.scrollIntoView({behavior: 'smooth', block: 'start'});
+    }));
+  $('#mindBackdrop').hidden = false;
+  document.body.style.overflow = 'hidden';
+}
+function closeMind(){
+  $('#mindBackdrop').hidden = true;
+  $('#mindBody').innerHTML = '';
+  document.body.style.overflow = '';
+}
+$('#mindCloseBtn').addEventListener('click', closeMind);
+$('#mindBackdrop').addEventListener('click', e => { if (e.target.id === 'mindBackdrop') closeMind(); });
+
+/* ================= search ================= */
+const searchInput = $('#searchInput'), searchResults = $('#searchResults');
+function doSearch(q){
+  q = q.trim().toLowerCase();
+  if (!q){ searchResults.classList.remove('show'); return; }
+  const hits = [];
+  for (const l of LESSONS){
+    if (l.title.toLowerCase().includes(q)){
+      hits.push({l, snip: l.md.split('\n').find(x => x.toLowerCase().includes(q)) || ''});
+      continue;
+    }
+    const ln = l.md.toLowerCase().indexOf(q);
+    if (ln >= 0){
+      const before = l.md.lastIndexOf('\n', ln);
+      const line = l.md.slice(before + 1, l.md.indexOf('\n', ln) > 0 ? l.md.indexOf('\n', ln) : undefined);
+      hits.push({l, snip: line});
+    }
+    if (hits.length >= 8) break;
+  }
+  searchResults.innerHTML = hits.length
+    ? hits.map(h => {
+        let s = h.snip.replace(/[#*`|>]/g, '').trim();
+        const at = s.toLowerCase().indexOf(q);
+        if (at > 26) s = '…' + s.slice(at - 22);
+        if (s.length > 70) s = s.slice(0, 70) + '…';
+        const safe = esc(s).replace(new RegExp('(' + q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&') + ')','ig'), '<b>$1</b>');
+        return '<div class="sr-item" data-id="'+h.l.id+'"><div class="t">'+h.l.id+' · '+esc(h.l.short)+'</div><div class="s">'+safe+'</div></div>';
+      }).join('')
+    : '<div class="sr-empty">没有找到包含「'+esc(q)+'」的内容</div>';
+  searchResults.classList.add('show');
+  searchResults.querySelectorAll('.sr-item').forEach(el =>
+    el.addEventListener('mousedown', e => {
+      e.preventDefault();
+      location.hash = '#/lesson/' + el.dataset.id;
+      searchResults.classList.remove('show');
+      searchInput.value = '';
+      document.body.classList.remove('nav-open');
+    }));
+}
+searchInput.addEventListener('input', () => doSearch(searchInput.value));
+searchInput.addEventListener('keydown', e => { if (e.key === 'Escape'){ searchResults.classList.remove('show'); searchInput.blur(); } });
+searchInput.addEventListener('blur', () => setTimeout(() => searchResults.classList.remove('show'), 150));
+
+/* ================= router & init ================= */
+let lastHash = null;
+function route(){
+  const h = location.hash || '#/home';
+  if (h === lastHash) return;
+  lastHash = h;
+  if (!$('#simBackdrop').hidden) closeSim();
+  if (h.startsWith('#/sim/')){
+    /* 直接用 URL 打开仿真的场景：背后先渲染首页 */
+    if (!view.querySelector('.hero, .lesson-head')){ renderHome(); renderSidebar(null); }
+    openSim(h.slice(6));
+    return;
+  }
+  window.scrollTo(0, 0);
+  if (h.startsWith('#/lesson/')){
+    const id = h.slice(9);
+    renderLesson(id);
+    renderSidebar(id);
+  } else if (h.startsWith('#/resource/')) {
+    renderResource(h.slice(11));
+    renderSidebar(null);
+  } else {
+    renderHome();
+    renderSidebar(null);
+  }
+  renderDiagrams();
+}
+window.addEventListener('hashchange', route);
+
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+  if (e.key === 'Escape'){
+    if (!$('#simBackdrop').hidden){ closeSim(); return; }
+    if (!$('#mindBackdrop').hidden){ closeMind(); return; }
+  }
+  if (!location.hash.startsWith('#/lesson/')) return;
+  const id = location.hash.slice(9);
+  const idx = LESSONS.findIndex(l => l.id === id);
+  if (e.key === 'ArrowLeft' && LESSONS[idx-1]) location.hash = '#/lesson/' + LESSONS[idx-1].id;
+  if (e.key === 'ArrowRight' && LESSONS[idx+1]) location.hash = '#/lesson/' + LESSONS[idx+1].id;
+});
+
+$('#menuBtn').addEventListener('click', () => document.body.classList.toggle('nav-open'));
+$('#overlay').addEventListener('click', () => document.body.classList.remove('nav-open'));
+
+/* theme */
+const T_KEY = 'pcbcourse.theme';document.documentElement.dataset.theme = localStorage.getItem(T_KEY) || 'light';
+const themeBtn = $('#themeBtn');
+themeBtn.textContent = document.documentElement.dataset.theme === 'dark' ? '☀️' : '🌙';
+themeBtn.addEventListener('click', () => {
+  const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+  document.documentElement.dataset.theme = next;
+  localStorage.setItem(T_KEY, next);
+  themeBtn.textContent = next === 'dark' ? '☀️' : '🌙';
+  /* 已渲染的 mermaid 图按新主题就地重绘 */
+  view.querySelectorAll('.diagram[data-done]').forEach(el => {
+    el.textContent = el.dataset.src || '';
+    delete el.dataset.done;
+  });
+  renderDiagrams();
+});
+
+/* 备份使用独立格式，恢复之前先核验每课的任务文本与顺序。 */
+function makeProgressBackup(){
+  return {format:'pcb-course-progress', version:1, exportedAt:new Date().toISOString(),
+    taskSignatures:Object.fromEntries(LESSONS.map(l => [l.id, l.taskSignature])),
+    progress:[...progress], checks};
+}
+function validateProgressBackup(data){
+  if (!data || typeof data !== 'object' || Array.isArray(data) || data.format !== 'pcb-course-progress' || data.version !== 1 ||
+      !Array.isArray(data.progress) || !data.checks || typeof data.checks !== 'object' || Array.isArray(data.checks) ||
+      !data.taskSignatures || typeof data.taskSignatures !== 'object' || Array.isArray(data.taskSignatures)) throw Error('文件格式不正确或版本不受支持');
+  if (data.progress.length > LESSONS.length || new Set(data.progress).size !== data.progress.length ||
+      data.progress.some(id => typeof id !== 'string' || !Object.hasOwn(BY_ID, id))) throw Error('课程完成记录不正确');
+  for (const [id, values] of Object.entries(data.checks)){
+    if (!Object.hasOwn(BY_ID, id) || !Array.isArray(values) || values.length > BY_ID[id].taskCount ||
+        values.some(value => value !== null && typeof value !== 'boolean')) throw Error('自测记录不正确');
+    if (values.length && data.taskSignatures[id] !== BY_ID[id].taskSignature)
+      throw Error('第 '+id+' 课的任务内容或顺序与备份不同，不能自动恢复，请保留备份并人工核对');
+  }
+  return {progress:data.progress, checks:data.checks};
+}
+$('#exportProgress').addEventListener('click', () => {
+  const blob = new Blob([JSON.stringify(makeProgressBackup(), null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob), a = document.createElement('a');
+  a.href = url; a.download = 'PCB课程学习进度-'+new Date().toISOString().slice(0,10)+'.json';
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+});
+$('#importProgress').addEventListener('click', () => $('#progressFile').click());
+$('#progressFile').addEventListener('change', async event => {
+  const file = event.target.files[0]; event.target.value = '';
+  if (!file) return;
+  let restored;
+  try {
+    if (file.size > 2 * 1024 * 1024) throw Error('文件超过 2 MB');
+    restored = validateProgressBackup(JSON.parse(await file.text()));
+  } catch (err) { alert('无法导入：'+err.message+'。当前进度未更改。'); return; }
+  if (!confirm('导入将替换当前课程完成状态和自测记录。建议先导出当前进度。确定继续吗？')) return;
+  const oldProgress = localStorage.getItem(P_KEY), oldChecks = localStorage.getItem(C_KEY);
+  try {
+    localStorage.setItem(P_KEY, JSON.stringify(restored.progress));
+    localStorage.setItem(C_KEY, JSON.stringify(restored.checks));
+  } catch (err) {
+    try {
+      if (oldProgress === null) localStorage.removeItem(P_KEY); else localStorage.setItem(P_KEY, oldProgress);
+      if (oldChecks === null) localStorage.removeItem(C_KEY); else localStorage.setItem(C_KEY, oldChecks);
+      alert('保存失败，已尝试恢复原进度。请检查浏览器存储空间。');
+    } catch (_) { alert('保存和回滚均失败；请检查浏览器存储，并使用之前导出的备份恢复。'); }
+    return;
+  }
+  progress = new Set(restored.progress); checks = restored.checks;
+  lastHash = null; route(); alert('进度已导入。');
+});
+$('#resetBtn').addEventListener('click', () => {
+  if (confirm('确定要清空全部学习进度和自测打卡记录吗？此操作不可恢复。')){
+    progress = new Set(); checks = {};
+    saveProgress(); saveChecks();
+    renderSidebar(null); route();
+    lastHash = null; route();
+  }
+});
+
+renderSidebar(null);
+document.querySelector('.brand .sub').textContent = '从零基础到就业 · ' + STAGES.length + ' 阶段 ' + LESSONS.length + ' 课';
+route();
+</script>
+</body>
+</html>
