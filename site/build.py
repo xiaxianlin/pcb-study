@@ -14,11 +14,17 @@ HERE = pathlib.Path(__file__).resolve().parent
 COURSE_DIR = HERE.parent
 CN_NUM = '一二三四五'
 # 课程导航次序；分阶段按章节选择的具体顺序以 README 为准。
-ORDER = [f'{n:02d}' for n in range(1, 27)]
-STAGE_BY_ID = {k: i for i, ids in enumerate(('01 02 03 04 05 06 07 08', '09 10 11 12', '13 14 15 16 17', '18 19 20 21 22', '23 24 25 26'), 1) for k in ids.split()}
-# 阶段一重构期间，phase1-new/ 下的同名编号章节优先于根目录旧章节。
-# 这样每写完一章就能在本地站点预览，不必等 8 章全部替换完。
-PHASE1_DIR = COURSE_DIR / 'phase1-new'
+ORDER = [f'{n:02d}' for n in range(1, 36)]
+STAGE_BY_ID = {k: i for i, ids in enumerate((
+    '01 02 03 04 05 06 07 08',
+    '09 10 11 12 13 14 15 16',
+    '17 18 19 20 21 22 23',
+    '24 25 26 27 28 29 30',
+    '31 32 33 34 35',
+), 1) for k in ids.split()}
+# 重构后的章节放在 phase*-new/ 下，同编号文件优先于根目录旧章节。
+# 这样每写完一章就能在本地站点预览，不必等整阶段替换完。
+PHASE_DIRS = [COURSE_DIR / f'phase{n}-new' for n in range(1, 6)]
 
 
 def parse_lesson(path: pathlib.Path) -> dict:
@@ -64,7 +70,7 @@ def parse_lesson(path: pathlib.Path) -> dict:
 
     short = re.sub(r'^第\s*\d+\s*[课章]\s*·\s*', '', title)
     short = re.sub(r'^项目实战\s*·\s*', '', short)
-    if lesson_id in ('22', '23', '25'):
+    if lesson_id in ('30', '31', '34'):
         short = re.sub(r'\s*（选学）$', '', short)
     return {
         'id': lesson_id,
@@ -73,7 +79,7 @@ def parse_lesson(path: pathlib.Path) -> dict:
         'stage': stage,
         'diff': max(1, min(5, diff)),
         'prev': prev,
-        'optional': lesson_id in ('22', '23', '25'),
+        'optional': lesson_id in ('30', '31', '34'),
         'md': body,
         # 备份恢复时检查每课任务的内容和次序，避免错位。
         'taskSignature': hashlib.sha256('\n'.join(
@@ -143,11 +149,12 @@ def collect_resources():
 
 
 def collect_lesson_files():
-    """收集课程文件；phase1-new/ 中同编号文件覆盖根目录旧版。"""
+    """收集课程文件；phase*-new/ 中同编号文件覆盖根目录旧版。"""
     by_id = {path.name[:2]: path for path in sorted(COURSE_DIR.glob('[0-9][0-9]-*.md'))}
-    if PHASE1_DIR.is_dir():
-        for path in sorted(PHASE1_DIR.glob('[0-9][0-9]-*.md')):
-            by_id[path.name[:2]] = path
+    for phase_dir in PHASE_DIRS:
+        if phase_dir.is_dir():
+            for path in sorted(phase_dir.glob('[0-9][0-9]-*.md')):
+                by_id[path.name[:2]] = path
     return [by_id[key] for key in sorted(by_id)]
 
 
