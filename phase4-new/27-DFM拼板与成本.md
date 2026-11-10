@@ -318,7 +318,7 @@ DFM 不只在板厂，也在“贴片/测试/组装”。测试点要“够大�
   <text x="20" y="28" font-size="16" fill="currentColor">图 27-4：2×3 拼板（工艺边+Mark+分板线）</text>
   <rect x="70" y="60" width="580" height="230" fill="none" stroke="currentColor" stroke-width="2"/>
   <rect x="90" y="80" width="540" height="190" fill="none" stroke="currentColor" stroke-width="1" stroke-dasharray="4 3"/>
-  <text x="100" y="74" font-size="10" fill="currentColor">工艺边 8mm</text>
+  <text x="300" y="76" font-size="10" fill="currentColor">工艺边 8mm</text>
   <rect x="100" y="90" width="160" height="80" fill="none" stroke="currentColor" stroke-width="1"/>
   <rect x="280" y="90" width="160" height="80" fill="none" stroke="currentColor" stroke-width="1"/>
   <rect x="460" y="90" width="160" height="80" fill="none" stroke="currentColor" stroke-width="1"/>
@@ -523,6 +523,12 @@ rc-charge
 
 **课程**：DFM 报告不是“挑刺”，是“报价单的明细”。
 
+#### 27.6.10 小结：DFM 是“把工艺装进设计”
+
+一块板能不能赚钱，不只看“设计多漂亮”，还看“能不能一次做出来、一次贴好、一次过测试”。DFM 把“板厂能力/贴片机/治具/分板”提前装进设计，让“报价/交期/良率”都可控。评审时把本章清单当“门禁”，比事后救火便宜得多。
+
+**课程**：DFM 做得好，硬件工程师就少熬一半的夜。
+
 ### 27.7 常见坑
 
 1. **无工艺边**：贴片夹不住。
@@ -570,6 +576,18 @@ rc-charge
 打样飞线/手工焊能过，批量 DFM 不过。修法：打样就按批量 DFM 画，首件按批量工艺验证。
 
 **课程**：打样是“预演”，不是“特例”。
+
+#### 27.7.7 拼板尺寸超出贴片机轨道
+
+拼板太大，贴片机轨道/夹持放不下，只能“单板贴/手工贴”。修法：先查贴片机最大板宽（常见 350～460mm），再定拼板尺寸；超宽就“竖拼/减少列数”。
+
+**课程**：拼板尺寸要“先问贴片机”，再问板厂。
+
+#### 27.7.8 忽略“分板方向”
+
+V-cut 方向与元件/焊盘平行，掰板时应力拉到焊点；修法：分板线避开“长焊盘/细间距”，按“最省力/最不伤”的方向掰。
+
+**课程**：掰板也是“力学设计”。
 
 ### 27.8 本章复盘
 
