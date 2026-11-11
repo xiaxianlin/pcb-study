@@ -20,17 +20,17 @@ MOS 管是电压控制的开关，也是现代电源和数字电路的基石。�
 
 ### 7.1 它解决什么问题：三个真实场景
 
-#### 场景一：大电流负载，三极管发热严重
+#### 7.1.1 场景一：大电流负载，三极管发热严重
 
 用三极管驱动 12V/2A 的电机，假设 VCE(sat)=0.5V，功耗 `0.5×2=1W`，SOT-23 封装根本扛不住。换成导通电阻 20mΩ 的 NMOS，功耗 `2²×0.02=0.08W`，发热小得多。
 
 这就是 MOS 在大电流开关里取代三极管的核心原因：**导通时压降可以很低**。
 
-#### 场景二：PWM 调光、调速
+#### 7.1.2 场景二：PWM 调光、调速
 
 LED 调光、电机调速常用 PWM：开关快速通断，改变占空比。MOS 的开关速度可以很高，栅极驱动简单，适合高频 PWM。但频率越高，栅极充放电和开关损耗越不能忽略。
 
-#### 场景三：电源转换（Buck/Boost）
+#### 7.1.3 场景三：电源转换（Buck/Boost）
 
 开关电源的功率级几乎都用 MOS 做开关。第 04 章 Buck 电路里的高边开关、低边开关，实际就是 MOS。理解 MOS 的导通电阻、栅极电荷、体二极管，才能看懂电源为什么发热、为什么需要驱动器。
 
@@ -299,6 +299,67 @@ EN ── RG ── G
 
 ---
 
+#### 7.5.4 开关过程与米勒平台（图 7-4）
+
+MOS 不是“瞬间开关”：栅极电荷要“充/放”，中间会出现一段 **VGS 几乎不变**的“米勒平台”，此时 `VDS` 正在下降、`ID` 正在上升，**“电压×电流”同时很大**，开关损耗主要发生在这一小段。看三件事：①栅极电荷 `Qg` 决定“驱动要多快”；②`Crss`（米勒电容）决定“平台多长”；③栅极电阻 `Rg` 决定“充放电快慢”。`Rg` 太小→振铃/EMI；太大→开关慢、发热。
+
+```svg
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 300">
+  <text x="20" y="28" font-size="16" fill="currentColor">图 7-4：开通瞬间的 VGS、VDS、ID 与米勒平台</text>
+  <line x1="60" y1="220" x2="660" y2="220" stroke="currentColor" stroke-width="1.5"/>
+  <line x1="60" y1="60" x2="60" y2="220" stroke="currentColor" stroke-width="1.5"/>
+  <text x="300" y="246" font-size="10" fill="currentColor">时间 t</text>
+  <text x="20" y="70" font-size="10" fill="currentColor">幅度</text>
+  <line x1="60" y1="80" x2="660" y2="80" stroke="currentColor" stroke-width="1" stroke-dasharray="3 3"/>
+  <polyline points="60,220 200,220 240,150 300,150 340,90 420,90 660,90" fill="none" stroke="currentColor" stroke-width="2"/>
+  <text x="420" y="80" font-size="10" fill="currentColor">VGS</text>
+  <polyline points="60,90 240,90 320,200 660,200" fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="4 3"/>
+  <text x="600" y="196" font-size="10" fill="currentColor">VDS</text>
+  <polyline points="60,215 240,215 340,120 660,120" fill="none" stroke="currentColor" stroke-width="1.5"/>
+  <text x="600" y="140" font-size="10" fill="currentColor">ID</text>
+  <line x1="300" y1="60" x2="300" y2="220" stroke="currentColor" stroke-width="1" stroke-dasharray="2 2"/>
+  <line x1="420" y1="60" x2="420" y2="220" stroke="currentColor" stroke-width="1" stroke-dasharray="2 2"/>
+  <text x="248" y="60" font-size="9" fill="currentColor">平台起点</text>
+  <text x="368" y="60" font-size="9" fill="currentColor">平台终点</text>
+  <text x="60" y="272" font-size="10" fill="currentColor">VGS 在平台期几乎不变，VDS 与 ID 同时变化，损耗集中在这段时间。</text>
+</svg>
+```
+
+**读图 7-4**：平台越长（`Rg` 大/驱动弱），开关损耗越大；平台期是“发热的主力时段”。
+
+#### 7.5.5 热阻链与散热（图 7-5）
+
+结温 = 环境温度 + 功耗 × 总热阻。总热阻由四段串起来：`Rth(j-c)`（结到壳，手册给）+ `Rth(c-s)`（壳到散热片，靠导热垫/硅脂）+ `Rth(s-a)`（散热片到空气，靠面积/风）+ `Rth(a)`（环境）。任何一段“堵住”，结温就“飙升”。降额的本质：**让“算出来的结温”低于“允许结温”并留余量**（常见留 20℃ 以上）。
+
+```svg
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 280">
+  <text x="20" y="28" font-size="16" fill="currentColor">图 7-5：从结到环境的热阻链（串联）</text>
+  <rect x="50" y="80" width="110" height="70" rx="6" fill="none" stroke="currentColor" stroke-width="2"/>
+  <text x="66" y="108" font-size="11" fill="currentColor">芯片结</text>
+  <text x="66" y="130" font-size="9" fill="currentColor">Tj（结温）</text>
+  <rect x="200" y="80" width="110" height="70" rx="6" fill="none" stroke="currentColor" stroke-width="2"/>
+  <text x="222" y="108" font-size="11" fill="currentColor">器件壳</text>
+  <text x="222" y="130" font-size="9" fill="currentColor">Tc</text>
+  <rect x="350" y="80" width="110" height="70" rx="6" fill="none" stroke="currentColor" stroke-width="2"/>
+  <text x="372" y="108" font-size="11" fill="currentColor">散热片</text>
+  <text x="372" y="130" font-size="9" fill="currentColor">Ts</text>
+  <rect x="500" y="80" width="110" height="70" rx="6" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="4 3"/>
+  <text x="524" y="108" font-size="11" fill="currentColor">环境空气</text>
+  <text x="524" y="130" font-size="9" fill="currentColor">Ta</text>
+  <line x1="160" y1="115" x2="200" y2="115" stroke="currentColor" stroke-width="2"/>
+  <line x1="310" y1="115" x2="350" y2="115" stroke="currentColor" stroke-width="2"/>
+  <line x1="460" y1="115" x2="500" y2="115" stroke="currentColor" stroke-width="2"/>
+  <text x="140" y="66" font-size="9" fill="currentColor">Rth(j-c)</text>
+  <text x="292" y="66" font-size="9" fill="currentColor">Rth(c-s)</text>
+  <text x="440" y="66" font-size="9" fill="currentColor">Rth(s-a)</text>
+  <text x="50" y="190" font-size="10" fill="currentColor">Tj = Ta + P ×（Rth(j-c) + Rth(c-s) + Rth(s-a)）</text>
+  <text x="50" y="214" font-size="10" fill="currentColor">例：Ta=40℃、P=2W、三段合计 20℃/W → Tj≈80℃，若上限 150℃ 仍有 70℃ 余量。</text>
+  <text x="50" y="238" font-size="10" fill="currentColor">导热垫太厚/没压紧、散热片太小、无风，都会让 Rth(s-a) 明显变大。</text>
+</svg>
+```
+
+**读图 7-5**：算结温不是“只加一段”，是“四段相加”；先看“哪段最大”，再决定“加铜/换垫/加风”。
+
 ### 7.6 测量与仿真
 
 #### 7.6.1 万用表测 MOS
@@ -340,39 +401,39 @@ EN ── RG ── G
 
 ### 7.7 常见坑
 
-#### 坑 1：只看 VGS(th)，不看 RDS(on)
+#### 7.7.1 坑 1：只看 VGS(th)，不看 RDS(on)
 
 `VGS(th)=2V` 不代表 3.3V 就能充分导通。必须查实际 `VGS` 下的 `RDS(on)`。
 
-#### 坑 2：栅极悬空
+#### 7.7.2 坑 2：栅极悬空
 
 GPIO 高阻、复位、上电瞬间，栅极可能被干扰，MOS 误导通。加 `RGS` 下拉/上拉，保证默认关断。
 
-#### 坑 3：高边 NMOS 直接用 GPIO
+#### 7.7.3 坑 3：高边 NMOS 直接用 GPIO
 
 NMOS 高边需要 `VGS` 高于源极，GPIO 3.3V 根本不够，必须自举/高边驱动。
 
-#### 坑 4：忽略体二极管
+#### 7.7.4 坑 4：忽略体二极管
 
 MOS 关断不阻断反向电流，防反接、电池切换可能倒灌。要查体二极管方向。
 
-#### 坑 5：ID 额定值当实际能力
+#### 7.7.5 坑 5：ID 额定值当实际能力
 
 ID 是在特定散热条件下测的，SOT-23 实际可能只能跑 1A 左右。按热阻算。
 
-#### 坑 6：栅极电阻太大/太小
+#### 7.7.6 坑 6：栅极电阻太大/太小
 
 太大：开关慢、损耗大、可能振荡；太小：驱动峰值电流大、振铃。按 Qg 和频率选。
 
-#### 坑 7：忘记散热焊盘
+#### 7.7.7 坑 7：忘记散热焊盘
 
 DFN/SO-8 的散热焊盘不焊，热阻大幅上升，实际电流能力骤降。
 
-#### 坑 8：静电损坏
+#### 7.7.8 坑 8：静电损坏
 
 手摸栅极可能击穿氧化层。防静电措施不能省。
 
-#### 坑 9：同步 Buck 直通
+#### 7.7.9 坑 9：同步 Buck 直通
 
 高边/低边同时导通，电源短路，瞬间大电流。死区时间必须由控制器保证。
 
