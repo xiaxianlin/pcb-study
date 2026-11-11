@@ -176,11 +176,11 @@ BGA 虚焊的典型现象：时好时坏、按压/加热后恢复、低温/高�
 
 **课程**：维修的“隐形质量”在耗材，不在手艺。
 
-#### 31.3.9 工具与参数速查（图 31-4、图 31-5）
+#### 31.3.9 工具与参数速查（图 31-1、图 31-2）
 
 ```svg
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 340">
-  <text x="20" y="28" font-size="16" fill="currentColor">图 31-4：BGA 返修温度曲线</text>
+  <text x="20" y="28" font-size="16" fill="currentColor">图 31-1：BGA 返修温度曲线</text>
   <line x1="60" y1="260" x2="660" y2="260" stroke="currentColor" stroke-width="1.5"/>
   <line x1="60" y1="260" x2="60" y2="60" stroke="currentColor" stroke-width="1.5"/>
   <line x1="60" y1="100" x2="660" y2="100" stroke="currentColor" stroke-width="1" stroke-dasharray="4 3"/>
@@ -200,7 +200,7 @@ BGA 虚焊的典型现象：时好时坏、按压/加热后恢复、低温/高�
 
 ```svg
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 340">
-  <text x="20" y="28" font-size="16" fill="currentColor">图 31-5：不亮故障树</text>
+  <text x="20" y="28" font-size="16" fill="currentColor">图 31-2：不亮故障树</text>
   <rect x="270" y="50" width="150" height="44" fill="none" stroke="currentColor" stroke-width="2"/>
   <text x="300" y="78" font-size="11" fill="currentColor">不亮</text>
   <rect x="40" y="140" width="130" height="60" fill="none" stroke="currentColor" stroke-width="1.5"/>
@@ -250,7 +250,7 @@ BGA 虚焊的典型现象：时好时坏、按压/加热后恢复、低温/高�
 
 ```svg
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 340">
-  <text x="20" y="30" font-size="16" fill="currentColor">图 31-1：不亮排查顺序</text>
+  <text x="20" y="30" font-size="16" fill="currentColor">图 31-3：不亮排查顺序</text>
   <rect x="280" y="55" width="160" height="50" rx="6" fill="none" stroke="currentColor" stroke-width="2"/>
   <text x="315" y="85" font-size="13" fill="currentColor">不亮</text>
   <rect x="60" y="140" width="150" height="50" rx="6" fill="none" stroke="currentColor" stroke-width="1.5"/>
@@ -275,7 +275,7 @@ BGA 虚焊的典型现象：时好时坏、按压/加热后恢复、低温/高�
 
 ```svg
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 300">
-  <text x="20" y="30" font-size="16" fill="currentColor">图 31-2：限流+热像定位短路</text>
+  <text x="20" y="30" font-size="16" fill="currentColor">图 31-4：限流+热像定位短路</text>
   <rect x="80" y="80" width="160" height="80" rx="6" fill="none" stroke="currentColor" stroke-width="2"/>
   <text x="100" y="115" font-size="12" fill="currentColor">可调电源</text>
   <text x="100" y="140" font-size="11" fill="currentColor">1V/限流 100mA</text>
@@ -295,7 +295,7 @@ BGA 虚焊的典型现象：时好时坏、按压/加热后恢复、低温/高�
 
 ```svg
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 300">
-  <text x="20" y="30" font-size="16" fill="currentColor">图 31-3：BGA 返修五步</text>
+  <text x="20" y="30" font-size="16" fill="currentColor">图 31-5：BGA 返修五步</text>
   <rect x="30" y="80" width="120" height="60" rx="6" fill="none" stroke="currentColor" stroke-width="1.5"/>
   <text x="50" y="115" font-size="11" fill="currentColor">预热</text>
   <rect x="170" y="80" width="120" height="60" rx="6" fill="none" stroke="currentColor" stroke-width="1.5"/>
