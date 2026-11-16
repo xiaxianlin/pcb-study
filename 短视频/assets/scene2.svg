@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" font-family="'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif">
+  <rect width="1920" height="1080" fill="#FDFBF7"/>
+
+  <!-- header -->
+  <text x="960" y="100" text-anchor="middle" font-size="60" font-weight="800" fill="#1F2937">电荷：电的"原材料"</text>
+  <rect x="770" y="124" width="380" height="10" rx="5" fill="#F97316" opacity="0.8"/>
+
+  <!-- atom (left) -->
+  <g transform="translate(360,450)">
+    <ellipse cx="0" cy="0" rx="215" ry="84" fill="none" stroke="#93C5FD" stroke-width="5"/>
+    <ellipse cx="0" cy="0" rx="215" ry="84" fill="none" stroke="#93C5FD" stroke-width="5" transform="rotate(60)"/>
+    <ellipse cx="0" cy="0" rx="215" ry="84" fill="none" stroke="#93C5FD" stroke-width="5" transform="rotate(-60)"/>
+    <circle cx="0" cy="0" r="66" fill="#FED7AA" stroke="#F97316" stroke-width="6"/>
+    <text x="0" y="20" text-anchor="middle" font-size="58" font-weight="800" fill="#EA580C">＋</text>
+    <circle cx="215" cy="0" r="32" fill="#BFDBFE" stroke="#3B82F6" stroke-width="5"/>
+    <text x="215" y="12" text-anchor="middle" font-size="34" font-weight="700" fill="#2563EB">−</text>
+    <circle cx="-107" cy="-186" r="32" fill="#BFDBFE" stroke="#3B82F6" stroke-width="5"/>
+    <text x="-107" y="-173" text-anchor="middle" font-size="34" font-weight="700" fill="#2563EB">−</text>
+    <circle cx="-107" cy="186" r="32" fill="#BFDBFE" stroke="#3B82F6" stroke-width="5"/>
+    <text x="-107" y="199" text-anchor="middle" font-size="34" font-weight="700" fill="#2563EB">−</text>
+  </g>
+  <text x="360" y="745" text-anchor="middle" font-size="38" font-weight="700" fill="#1F2937">原子核（正电）＋ 电子（负电）</text>
+  <text x="360" y="800" text-anchor="middle" font-size="32" fill="#6B7280">正负相等、互相抵消 → 不带电</text>
+
+  <!-- arrows -->
+  <g stroke="#6B7280" stroke-width="6" fill="none" stroke-linecap="round" stroke-dasharray="14 12">
+    <path d="M660 380 C 780 340, 870 330, 970 330"/>
+    <path d="M660 560 C 780 620, 870 640, 970 640"/>
+  </g>
+  <text x="815" y="305" text-anchor="middle" font-size="32" fill="#6B7280">电子搬走</text>
+  <text x="815" y="700" text-anchor="middle" font-size="32" fill="#6B7280">电子塞进</text>
+
+  <!-- positive object (right top) -->
+  <g transform="translate(1240,250)">
+    <rect x="0" y="0" width="280" height="180" rx="26" fill="#FFF7ED" stroke="#F97316" stroke-width="5"/>
+    <text x="140" y="110" text-anchor="middle" font-size="84" font-weight="800" fill="#EA580C">＋</text>
+    <text x="140" y="160" text-anchor="middle" font-size="32" font-weight="700" fill="#EA580C">带正电</text>
+  </g>
+
+  <!-- negative object (right bottom) -->
+  <g transform="translate(1240,530)">
+    <rect x="0" y="0" width="280" height="180" rx="26" fill="#EFF6FF" stroke="#3B82F6" stroke-width="5"/>
+    <text x="140" y="110" text-anchor="middle" font-size="84" font-weight="800" fill="#2563EB">−</text>
+    <text x="140" y="160" text-anchor="middle" font-size="32" font-weight="700" fill="#2563EB">带负电</text>
+  </g>
+
+  <!-- bottom note -->
+  <g transform="translate(560,830)">
+    <rect x="0" y="0" width="800" height="62" rx="31" fill="#F3F4F6" stroke="#9CA3AF" stroke-width="3"/>
+    <text x="400" y="42" text-anchor="middle" font-size="32" font-weight="600" fill="#374151">"带电的多少"叫电荷（单位：库仑 C）</text>
+  </g>
+</svg>

@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" font-family="'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif">
+  <rect width="1920" height="1080" fill="#FDFBF7"/>
+
+  <g transform="translate(560,50)">
+    <rect x="0" y="0" width="800" height="80" rx="40" fill="#F3F4F6" stroke="#6B7280" stroke-width="4"/>
+    <text x="400" y="54" text-anchor="middle" font-size="44" font-weight="800" fill="#374151">绝缘体 = 走不通的死胡同</text>
+  </g>
+
+  <!-- dead end with tied electron -->
+  <g transform="translate(240,175)">
+    <path d="M40 360 L 40 60 L 560 60 L 560 360" fill="none" stroke="#6B7280" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M40 360 L 40 60 L 560 60 L 560 360" fill="none" stroke="#9CA3AF" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+    <g stroke="#6B7280" stroke-width="4" opacity="0.6">
+      <line x1="40" y1="140" x2="105" y2="140"/><line x1="40" y1="220" x2="105" y2="220"/><line x1="40" y1="300" x2="105" y2="300"/>
+      <line x1="495" y1="140" x2="560" y2="140"/><line x1="495" y1="220" x2="560" y2="220"/><line x1="495" y1="300" x2="560" y2="300"/>
+      <line x1="170" y1="60" x2="170" y2="115"/><line x1="300" y1="60" x2="300" y2="115"/><line x1="430" y1="60" x2="430" y2="115"/>
+    </g>
+    <circle cx="300" cy="255" r="46" fill="#BFDBFE" stroke="#3B82F6" stroke-width="6"/>
+    <text x="300" y="271" text-anchor="middle" font-size="42" font-weight="800" fill="#2563EB">−</text>
+    <g stroke="#92400E" stroke-width="8" stroke-linecap="round">
+      <path d="M260 228 C 185 185, 125 170, 70 150"/>
+      <path d="M340 228 C 415 185, 475 170, 530 150"/>
+    </g>
+    <text x="300" y="375" text-anchor="middle" font-size="32" font-weight="700" fill="#6B7280">电子被死死捆住，跑不掉</text>
+  </g>
+
+  <!-- material cards -->
+  <g text-anchor="middle" font-size="32" font-weight="700">
+    <g transform="translate(1060,200)">
+      <rect x="0" y="0" width="290" height="105" rx="20" fill="#F3F4F6" stroke="#6B7280" stroke-width="4"/>
+      <text x="145" y="62" fill="#374151">玻璃纤维</text>
+      <text x="145" y="95" font-size="25" fill="#6B7280">织布一样的骨架</text>
+    </g>
+    <g transform="translate(1400,200)">
+      <rect x="0" y="0" width="290" height="105" rx="20" fill="#F3F4F6" stroke="#6B7280" stroke-width="4"/>
+      <text x="145" y="62" fill="#374151">塑料</text>
+      <text x="145" y="95" font-size="25" fill="#6B7280">外壳、导线外皮</text>
+    </g>
+    <g transform="translate(1060,345)">
+      <rect x="0" y="0" width="290" height="105" rx="20" fill="#F3F4F6" stroke="#6B7280" stroke-width="4"/>
+      <text x="145" y="62" fill="#374151">陶瓷</text>
+      <text x="145" y="95" font-size="25" fill="#6B7280">耐热又绝缘</text>
+    </g>
+    <g transform="translate(1400,345)">
+      <rect x="0" y="0" width="290" height="105" rx="20" fill="#F3F4F6" stroke="#6B7280" stroke-width="4"/>
+      <text x="145" y="62" fill="#374151">空气</text>
+      <text x="145" y="95" font-size="25" fill="#6B7280">也是绝缘体</text>
+    </g>
+  </g>
+
+  <!-- FR-4 highlight -->
+  <g transform="translate(480,670)">
+    <rect x="0" y="0" width="960" height="150" rx="26" fill="#ECFDF5" stroke="#10B981" stroke-width="5"/>
+    <text x="480" y="64" text-anchor="middle" font-size="46" font-weight="800" fill="#047857">FR-4：绿色板子的基材</text>
+    <text x="480" y="118" text-anchor="middle" font-size="34" fill="#059669">玻璃纤维 ＋ 树脂，专门负责绝缘</text>
+  </g>
+</svg>

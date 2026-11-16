@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-CN" data-theme="light">
+<html lang="zh-CN" data-theme="eye">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -40,10 +40,22 @@ html[data-theme='dark']{
   --shadow:0 12px 30px rgba(0,0,0,.5);
   --bq-bg:rgba(216,180,90,.05);
 }
+html[data-theme='eye']{
+  --bg:#f3ecdc; --bg2:#ecdfc6; --panel:#fbf5e7; --panel2:#f2e7cf;
+  --line:#e4d5b4; --line2:#d3bf96;
+  --text:#3c3324; --muted:#68593f; --faint:#93825f;
+  --green:#5e8538; --green-dim:#496a2a; --gold:#9a7420;
+  --s1:#8a5e1f;
+  --st1:#7a8a3c; --st2:#8a5e1f; --st3:#5e8538; --st4:#b06a1e; --st5:#7c5fa8;
+  --btn-text:#3c3324; --strong:#241e12;
+  --code-bg:#eee2c6; --code-text:#54441f; --dot:rgba(74,56,28,.12);
+  --shadow:0 12px 30px rgba(90,70,30,.18);
+  --bq-bg:rgba(154,116,32,.12);
+}
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
 body{margin:0;background:var(--bg);color:var(--text);
-  font:500 15px/1.75 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue","Noto Sans",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
+  font:500 16px/1.82 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue","Noto Sans",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
   -webkit-font-smoothing:antialiased}
 a{color:var(--s1);text-decoration:none}
 a:hover{text-decoration:underline}
@@ -231,12 +243,12 @@ svg.routemap{width:100%;min-width:640px;height:auto;display:block}
 .spacer{flex:1}
 
 /* markdown content */
-.md{margin-top:28px}
+.md{margin-top:28px;font-size:16px;line-height:1.85}
 .md h1{font-size:24px;margin:34px 0 14px;padding-bottom:10px;border-bottom:1px solid var(--line)}
 .md h2{font-size:21px;margin:36px 0 14px;padding-left:14px;border-left:4px solid var(--green)}
 .md h3{font-size:19px;margin:30px 0 12px;color:var(--text);font-weight:700;
   padding-bottom:6px;border-bottom:1px dashed var(--line2)}
-.md h4{font-size:15.5px;margin:26px 0 10px;color:var(--text);font-weight:700;
+.md h4{font-size:16px;margin:26px 0 10px;color:var(--text);font-weight:700;
   display:inline-block;max-width:100%;padding:4px 12px;
   background:var(--panel2);border-left:3px solid var(--green);border-radius:0 8px 8px 0}
 .md h4::before{content:"§ ";color:var(--green);font-weight:700}
@@ -252,7 +264,7 @@ svg.routemap{width:100%;min-width:640px;height:auto;display:block}
   background:var(--bq-bg);border-radius:0 8px 8px 0;color:var(--muted)}
 .md blockquote p{margin:4px 0}
 .md ul,.md ol{margin:12px 0;padding-left:26px}
-.md li{margin:5px 0}
+.md li{margin:6px 0;line-height:1.8}
 .md li.sub{margin-left:20px}
 .md hr{border:0;border-top:1px dashed var(--line2);margin:26px 0}
 .md details{margin:14px 0;border:1px solid var(--line);border-radius:10px;background:var(--panel2)}
@@ -282,7 +294,7 @@ svg.routemap{width:100%;min-width:640px;height:auto;display:block}
 .wv-lab{fill:var(--muted)}
 .wv-em{fill:var(--gold);font-weight:600}
 .tbl-wrap{overflow-x:auto;margin:14px 0;border:1px solid var(--line);border-radius:10px}
-.md table{border-collapse:collapse;width:100%;font-size:13.5px;line-height:1.6}
+.md table{border-collapse:collapse;width:100%;font-size:14px;line-height:1.65}
 .md th{background:var(--panel2);font-weight:700;text-align:left;white-space:nowrap}
 .md th,.md td{padding:8px 14px;border-bottom:1px solid var(--line)}
 .md tr:last-child td{border-bottom:0}
@@ -347,7 +359,7 @@ details.readme .inner{padding:4px 26px 26px}
   <button class="menu-btn" id="menuBtn" aria-label="打开目录">☰</button>
   <aside class="sidebar" id="sidebar">
     <div class="brand">
-      <div class="logo"><span class="dot"></span>PCB 设计课程<button id="themeBtn" title="切换亮/暗主题">🌙</button></div>
+      <div class="logo"><span class="dot"></span>PCB 设计课程<button id="themeBtn" title="切换主题：浅色 / 深色 / 护眼">🌙</button></div>
       <div class="sub">从零基础到就业 · 5 阶段 18 课</div>
     </div>
     <div class="search-wrap">
@@ -1115,14 +1127,20 @@ $('#menuBtn').addEventListener('click', () => document.body.classList.toggle('na
 $('#overlay').addEventListener('click', () => document.body.classList.remove('nav-open'));
 
 /* theme */
-const T_KEY = 'pcbcourse.theme';document.documentElement.dataset.theme = localStorage.getItem(T_KEY) || 'light';
+const T_KEY = 'pcbcourse.theme';
+const THEMES = ['light','dark','eye'];
+const ICONS = {light:'🌙', dark:'☀️', eye:'👁'};
+let cur = localStorage.getItem(T_KEY) || 'eye';
+if (!THEMES.includes(cur)) cur = 'eye';
+document.documentElement.dataset.theme = cur;
 const themeBtn = $('#themeBtn');
-themeBtn.textContent = document.documentElement.dataset.theme === 'dark' ? '☀️' : '🌙';
+const paintTheme = () => { themeBtn.textContent = ICONS[cur]; };
+paintTheme();
 themeBtn.addEventListener('click', () => {
-  const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
-  document.documentElement.dataset.theme = next;
-  localStorage.setItem(T_KEY, next);
-  themeBtn.textContent = next === 'dark' ? '☀️' : '🌙';
+  cur = THEMES[(THEMES.indexOf(cur) + 1) % THEMES.length];
+  document.documentElement.dataset.theme = cur;
+  localStorage.setItem(T_KEY, cur);
+  paintTheme();
   /* 已渲染的 mermaid 图按新主题就地重绘 */
   view.querySelectorAll('.diagram[data-done]').forEach(el => {
     el.textContent = el.dataset.src || '';

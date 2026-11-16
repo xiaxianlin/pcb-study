@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" font-family="'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif">
+  <rect width="1920" height="1080" fill="#FDFBF7"/>
+
+  <text x="960" y="95" text-anchor="middle" font-size="56" font-weight="800" fill="#1F2937">两个直觉，记住就够用</text>
+
+  <!-- repulsion (left top) -->
+  <g transform="translate(180,165)">
+    <circle cx="110" cy="110" r="64" fill="#FED7AA" stroke="#F97316" stroke-width="5"/>
+    <text x="110" y="133" text-anchor="middle" font-size="58" font-weight="800" fill="#EA580C">＋</text>
+    <circle cx="310" cy="110" r="64" fill="#FED7AA" stroke="#F97316" stroke-width="5"/>
+    <text x="310" y="133" text-anchor="middle" font-size="58" font-weight="800" fill="#EA580C">＋</text>
+    <g stroke="#EF4444" stroke-width="7" fill="none" stroke-linecap="round">
+      <path d="M148 80 L 62 34"/><path d="M272 80 L 358 34"/>
+      <path d="M148 140 L 62 186"/><path d="M272 140 L 358 186"/>
+    </g>
+    <g fill="#EF4444">
+      <path d="M62 34 l-17 4 9 14 Z"/><path d="M358 34 l17 4 -9 14 Z"/>
+      <path d="M62 186 l-17 -4 9 -14 Z"/><path d="M358 186 l17 -4 -9 -14 Z"/>
+    </g>
+    <text x="210" y="245" text-anchor="middle" font-size="38" font-weight="700" fill="#DC2626">同性相斥</text>
+  </g>
+
+  <!-- attraction (right top) -->
+  <g transform="translate(1120,165)">
+    <circle cx="110" cy="110" r="64" fill="#FED7AA" stroke="#F97316" stroke-width="5"/>
+    <text x="110" y="133" text-anchor="middle" font-size="58" font-weight="800" fill="#EA580C">＋</text>
+    <circle cx="310" cy="110" r="64" fill="#BFDBFE" stroke="#3B82F6" stroke-width="5"/>
+    <text x="310" y="133" text-anchor="middle" font-size="58" font-weight="800" fill="#2563EB">−</text>
+    <g stroke="#10B981" stroke-width="7" fill="none" stroke-linecap="round">
+      <path d="M180 80 L 240 80"/><path d="M180 140 L 240 140"/>
+    </g>
+    <g fill="#10B981">
+      <path d="M240 80 l-18 -7 0 14 Z"/><path d="M180 140 l18 7 0 -14 Z"/>
+    </g>
+    <text x="210" y="245" text-anchor="middle" font-size="38" font-weight="700" fill="#059669">异性相吸</text>
+  </g>
+
+  <!-- divider -->
+  <line x1="160" y1="495" x2="1760" y2="495" stroke="#D1D5DB" stroke-width="3" stroke-dasharray="12 10"/>
+
+  <!-- PCB as road -->
+  <g transform="translate(240,545)">
+    <rect x="0" y="0" width="1440" height="215" rx="28" fill="#065F46"/>
+    <rect x="0" y="0" width="1440" height="215" rx="28" fill="none" stroke="#064E3B" stroke-width="6"/>
+    <path d="M80 108 H 1100 L 1240 50 H 1380" fill="none" stroke="#D97706" stroke-width="44" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M80 108 H 1100 L 1240 50 H 1380" fill="none" stroke="#F59E0B" stroke-width="32" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M100 108 H 1080" fill="none" stroke="#FEF3C7" stroke-width="6" stroke-dasharray="26 22"/>
+    <circle cx="1100" cy="108" r="40" fill="#F59E0B" stroke="#B45309" stroke-width="5"/>
+    <g fill="#3B82F6" stroke="#1D4ED8" stroke-width="3">
+      <circle cx="260" cy="108" r="21"/><circle cx="520" cy="108" r="21"/><circle cx="780" cy="108" r="21"/>
+    </g>
+    <text x="260" y="117" text-anchor="middle" font-size="23" font-weight="700" fill="#EFF6FF">−</text>
+    <text x="520" y="117" text-anchor="middle" font-size="23" font-weight="700" fill="#EFF6FF">−</text>
+    <text x="780" y="117" text-anchor="middle" font-size="23" font-weight="700" fill="#EFF6FF">−</text>
+  </g>
+  <g font-size="36" font-weight="700">
+    <text x="330" y="820" fill="#B45309">铜线 = 电子的马路</text>
+    <text x="1180" y="820" fill="#B45309">焊盘 = 路口</text>
+  </g>
+  <text x="960" y="872" text-anchor="middle" font-size="32" fill="#6B7280">电荷只搬家，不凭空产生（电荷守恒）</text>
+</svg>

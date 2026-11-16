@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" font-family="'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif">
+  <rect width="1920" height="1080" fill="#FDFBF7"/>
+
+  <text x="960" y="90" text-anchor="middle" font-size="56" font-weight="800" fill="#1F2937">中间派：半导体</text>
+
+  <!-- silicon wafer -->
+  <g transform="translate(210,170)">
+    <circle cx="150" cy="150" r="135" fill="#E0E7FF" stroke="#6366F1" stroke-width="6"/>
+    <circle cx="150" cy="150" r="100" fill="none" stroke="#A5B4FC" stroke-width="3" stroke-dasharray="8 8"/>
+    <circle cx="150" cy="150" r="58" fill="none" stroke="#A5B4FC" stroke-width="3" stroke-dasharray="8 8"/>
+    <text x="150" y="168" text-anchor="middle" font-size="74" font-weight="800" fill="#4338CA">Si</text>
+    <text x="150" y="345" text-anchor="middle" font-size="36" font-weight="700" fill="#4338CA">硅：芯片的原材料</text>
+    <text x="150" y="392" text-anchor="middle" font-size="28" fill="#6B7280">导电能力可被控制</text>
+  </g>
+
+  <!-- chip switch array -->
+  <g transform="translate(680,180)">
+    <rect x="0" y="0" width="320" height="265" rx="24" fill="#1F2937"/>
+    <rect x="22" y="22" width="276" height="221" rx="14" fill="#312E81"/>
+    <g>
+      <rect x="46" y="50" width="70" height="38" rx="9" fill="#34D399"/>
+      <rect x="140" y="50" width="70" height="38" rx="9" fill="#6B7280"/>
+      <rect x="234" y="50" width="40" height="38" rx="9" fill="#34D399"/>
+      <rect x="46" y="113" width="70" height="38" rx="9" fill="#6B7280"/>
+      <rect x="140" y="113" width="70" height="38" rx="9" fill="#34D399"/>
+      <rect x="234" y="113" width="40" height="38" rx="9" fill="#6B7280"/>
+      <rect x="46" y="176" width="70" height="38" rx="9" fill="#34D399"/>
+      <rect x="140" y="176" width="70" height="38" rx="9" fill="#34D399"/>
+      <rect x="234" y="176" width="40" height="38" rx="9" fill="#6B7280"/>
+    </g>
+    <g stroke="#9CA3AF" stroke-width="5">
+      <line x1="70" y1="0" x2="70" y2="22"/><line x1="160" y1="0" x2="160" y2="22"/><line x1="250" y1="0" x2="250" y2="22"/>
+      <line x1="70" y1="265" x2="70" y2="243"/><line x1="160" y1="265" x2="160" y2="243"/><line x1="250" y1="265" x2="250" y2="243"/>
+    </g>
+    <text x="160" y="340" text-anchor="middle" font-size="34" font-weight="700" fill="#374151">芯片 = 开关阵列</text>
+    <text x="160" y="385" text-anchor="middle" font-size="27" fill="#6B7280">该通就通，该断就断</text>
+  </g>
+
+  <!-- PCB sandwich exploded -->
+  <g transform="translate(1180,130)">
+    <text x="200" y="0" text-anchor="middle" font-size="36" font-weight="800" fill="#047857">PCB 三明治</text>
+    <rect x="40" y="35" width="320" height="62" rx="13" fill="#F59E0B" stroke="#B45309" stroke-width="4"/>
+    <text x="200" y="76" text-anchor="middle" font-size="30" font-weight="700" fill="#78350F">铜箔（导体）</text>
+    <rect x="22" y="145" width="356" height="98" rx="15" fill="#059669" stroke="#065F46" stroke-width="4"/>
+    <text x="200" y="192" text-anchor="middle" font-size="32" font-weight="700" fill="#ECFDF5">玻璃纤维（绝缘）</text>
+    <text x="200" y="228" text-anchor="middle" font-size="25" fill="#A7F3D0">FR-4 基材</text>
+    <rect x="40" y="300" width="320" height="62" rx="13" fill="#F59E0B" stroke="#B45309" stroke-width="4"/>
+    <text x="200" y="341" text-anchor="middle" font-size="30" font-weight="700" fill="#78350F">铜箔（导体）</text>
+    <g stroke="#9CA3AF" stroke-width="3" stroke-dasharray="8 8">
+      <line x1="200" y1="97" x2="200" y2="145"/><line x1="200" y1="243" x2="200" y2="300"/>
+    </g>
+    <text x="200" y="412" text-anchor="middle" font-size="26" fill="#6B7280">蚀刻掉不要的铜，剩下的就是电路</text>
+  </g>
+
+  <!-- bottom strip -->
+  <g transform="translate(360,810)">
+    <rect x="0" y="0" width="1200" height="66" rx="33" fill="#EEF2FF" stroke="#6366F1" stroke-width="3"/>
+    <text x="600" y="44" text-anchor="middle" font-size="32" font-weight="600" fill="#4338CA">导体 + 绝缘体 + 半导体，板子上的三样材料齐了</text>
+  </g>
+</svg>

@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" font-family="'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif">
+  <rect width="1920" height="1080" fill="#FDFBF7"/>
+
+  <g transform="translate(560,50)">
+    <rect x="0" y="0" width="800" height="80" rx="40" fill="#ECFDF5" stroke="#10B981" stroke-width="4"/>
+    <text x="400" y="54" text-anchor="middle" font-size="44" font-weight="800" fill="#047857">导体 = 畅通的宽马路</text>
+  </g>
+
+  <!-- wide road with running electrons -->
+  <g transform="translate(200,180)">
+    <rect x="0" y="0" width="1520" height="195" rx="30" fill="#374151"/>
+    <rect x="24" y="24" width="1472" height="147" rx="20" fill="#4B5563"/>
+    <line x1="60" y1="98" x2="1460" y2="98" stroke="#F9FAFB" stroke-width="7" stroke-dasharray="40 30"/>
+    <g fill="#60A5FA" stroke="#1D4ED8" stroke-width="4">
+      <circle cx="220" cy="98" r="31"/><circle cx="560" cy="98" r="31"/><circle cx="900" cy="98" r="31"/><circle cx="1240" cy="98" r="31"/>
+    </g>
+    <g font-size="27" font-weight="700" fill="#EFF6FF" text-anchor="middle">
+      <text x="220" y="108">−</text><text x="560" y="108">−</text><text x="900" y="108">−</text><text x="1240" y="108">−</text>
+    </g>
+    <g stroke="#9CA3AF" stroke-width="5" stroke-linecap="round">
+      <line x1="150" y1="60" x2="195" y2="60"/><line x1="490" y1="60" x2="535" y2="60"/><line x1="830" y1="60" x2="875" y2="60"/><line x1="1170" y1="60" x2="1215" y2="60"/>
+    </g>
+  </g>
+
+  <!-- material cards -->
+  <g font-size="34" font-weight="700" text-anchor="middle">
+    <g transform="translate(180,425)">
+      <rect x="0" y="0" width="280" height="160" rx="22" fill="#FED7AA" stroke="#F97316" stroke-width="4"/>
+      <text x="140" y="84" font-size="56" fill="#B45309">Cu</text>
+      <text x="140" y="134" fill="#9A3412">铜</text>
+    </g>
+    <g transform="translate(520,425)">
+      <rect x="0" y="0" width="280" height="160" rx="22" fill="#FEF3C7" stroke="#D97706" stroke-width="4"/>
+      <text x="140" y="84" font-size="56" fill="#A16207">Au</text>
+      <text x="140" y="134" fill="#854D0E">金</text>
+    </g>
+    <g transform="translate(860,425)">
+      <rect x="0" y="0" width="280" height="160" rx="22" fill="#E5E7EB" stroke="#6B7280" stroke-width="4"/>
+      <text x="140" y="84" font-size="56" fill="#4B5563">Ag</text>
+      <text x="140" y="134" fill="#374151">银</text>
+    </g>
+    <g transform="translate(1200,425)">
+      <rect x="0" y="0" width="280" height="160" rx="22" fill="#DBEAFE" stroke="#3B82F6" stroke-width="4"/>
+      <text x="140" y="84" font-size="56" fill="#1D4ED8">Al</text>
+      <text x="140" y="134" fill="#1E40AF">铝</text>
+    </g>
+    <g transform="translate(1460,425)">
+      <rect x="0" y="0" width="280" height="160" rx="22" fill="#E0E7FF" stroke="#6366F1" stroke-width="4"/>
+      <text x="140" y="84" font-size="46" fill="#4338CA">Sn</text>
+      <text x="140" y="134" fill="#3730A3">焊锡</text>
+    </g>
+  </g>
+
+  <!-- PCB roles -->
+  <g transform="translate(360,650)">
+    <rect x="0" y="0" width="1200" height="150" rx="26" fill="#065F46"/>
+    <g text-anchor="middle" fill="#A7F3D0" font-size="38" font-weight="700">
+      <text x="200" y="62">走线</text>
+      <text x="600" y="62">焊盘</text>
+      <text x="1000" y="62">过孔内壁</text>
+    </g>
+    <g text-anchor="middle" fill="#FCD34D" font-size="30">
+      <text x="200" y="115">铜箔铺成的路</text>
+      <text x="600" y="115">零件落脚处</text>
+      <text x="1000" y="115">层与层之间的电梯</text>
+    </g>
+  </g>
+</svg>
