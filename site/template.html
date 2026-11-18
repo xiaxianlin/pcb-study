@@ -89,6 +89,9 @@ a:hover{text-decoration:underline}
 .sr-item .t{font-size:13.5px;font-weight:600}
 .sr-item .s{font-size:12px;color:var(--muted);margin-top:2px;line-height:1.5}
 .sr-item .s b{color:var(--gold);font-weight:600}
+.sr-item .loc{font-size:11px;color:var(--faint);margin-top:3px}
+.sr-count{padding:8px 12px;font-size:11.5px;color:var(--faint);border-bottom:1px solid var(--line)}
+.md h2.hit,.md h3.hit,.md h4.hit{background:var(--bq-bg);box-shadow:0 0 0 6px var(--bq-bg);border-radius:4px;transition:background .3s}
 .sr-empty{padding:14px;font-size:13px;color:var(--faint)}
 nav#nav{flex:1;padding:6px 10px 14px}
 .stage-group{margin-top:12px}
@@ -365,7 +368,7 @@ details.readme .inner{padding:4px 26px 26px}
     <div class="search-wrap">
       <div class="search-box">
         <span class="ic">🔍</span>
-        <input id="searchInput" type="text" placeholder="搜索课程内容…" autocomplete="off">
+        <input id="searchInput" type="text" placeholder="全文检索：关键词，多个用空格分隔" autocomplete="off" title="检索正文与小节标题；多个关键词用空格分隔；回车打开第一条结果">
       </div>
       <div class="search-results" id="searchResults"></div>
     </div>
@@ -839,6 +842,28 @@ function renderLesson(id){
     </div>
   </div>`;
 
+  /* 小节定位：检索命中跳转或 ?h=hd-N 深链，滚到该小节并短暂高亮 */
+  let target = PENDING_HIT;
+  PENDING_HIT = null;
+  try {
+    const hp = new URLSearchParams(location.search).get('h');
+    if (!target && hp && /^hd-\d+$/.test(hp)) target = hp;
+  } catch (_) {}
+  if (target){
+    setTimeout(() => {
+      const el = document.getElementById(target);
+      if (!el) return;
+      const top = el.getBoundingClientRect().top + (window.scrollY || window.pageYOffset || 0) - 90;
+      /* html 上是 scroll-behavior:smooth，深链要立即到位，先临时关掉 */
+      const prevBehavior = document.documentElement.style.scrollBehavior;
+      document.documentElement.style.scrollBehavior = 'auto';
+      window.scrollTo(0, Math.max(0, top));
+      document.documentElement.style.scrollBehavior = prevBehavior;
+      el.classList.add('hit');
+      setTimeout(() => el.classList.remove('hit'), 2200);
+    }, 260);
+  }
+
   /* checkbox persistence */
   view.querySelectorAll('input[data-ti]').forEach(inp => {
     inp.addEventListener('change', () => {
@@ -1038,48 +1063,139 @@ function closeMind(){
 $('#mindCloseBtn').addEventListener('click', closeMind);
 $('#mindBackdrop').addEventListener('click', e => { if (e.target.id === 'mindBackdrop') closeMind(); });
 
-/* ================= search ================= */
+/* ================= full-text search ================= */
 const searchInput = $('#searchInput'), searchResults = $('#searchResults');
-function doSearch(q){
-  q = q.trim().toLowerCase();
-  if (!q){ searchResults.classList.remove('show'); return; }
-  const hits = [];
+let FT_INDEX = null;
+
+/* 按标题切小节建索引：一课一节一条，锚点与 mdToHtml 生成的 hd-N 对应 */
+function buildSearchIndex(){
+  const idx = [];
   for (const l of LESSONS){
-    if (l.title.toLowerCase().includes(q)){
-      hits.push({l, snip: l.md.split('\n').find(x => x.toLowerCase().includes(q)) || ''});
-      continue;
+    const lines = l.md.split('\n');
+    let hid = 0, inCode = false;
+    let cur = { lesson:l, head:l.short, level:1, anchor:'hd-0', body:[] };
+    const flush = () => {
+      const body = cur.body.join('\n').replace(/^>+\s?/gm, '').trim();
+      idx.push({ lesson:cur.lesson, head:cur.head.replace(/`/g,'').trim(), level:cur.level,
+        anchor:cur.anchor, body:body, low:body.toLowerCase(), headLow:cur.head.toLowerCase() });
+    };
+    for (const line of lines){
+      if (/^\s*```/.test(line)){ inCode = !inCode; continue; }
+      const m = !inCode && line.match(/^(#{1,6})\s+(.*)$/);
+      if (m){
+        flush();
+        cur = { lesson:l, head:m[2], level:m[1].length, anchor:'hd-'+hid, body:[] };
+        hid++;
+        continue;
+      }
+      if (!inCode) cur.body.push(line);
     }
-    const ln = l.md.toLowerCase().indexOf(q);
-    if (ln >= 0){
-      const before = l.md.lastIndexOf('\n', ln);
-      const line = l.md.slice(before + 1, l.md.indexOf('\n', ln) > 0 ? l.md.indexOf('\n', ln) : undefined);
-      hits.push({l, snip: line});
-    }
-    if (hits.length >= 8) break;
+    flush();
   }
-  searchResults.innerHTML = hits.length
-    ? hits.map(h => {
-        let s = h.snip.replace(/[#*`|>]/g, '').trim();
-        const at = s.toLowerCase().indexOf(q);
-        if (at > 26) s = '…' + s.slice(at - 22);
-        if (s.length > 70) s = s.slice(0, 70) + '…';
-        const safe = esc(s).replace(new RegExp('(' + q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&') + ')','ig'), '<b>$1</b>');
-        return '<div class="sr-item" data-id="'+h.l.id+'"><div class="t">'+h.l.id+' · '+esc(h.l.short)+'</div><div class="s">'+safe+'</div></div>';
-      }).join('')
-    : '<div class="sr-empty">没有找到包含「'+esc(q)+'」的内容</div>';
+  return idx;
+}
+function countOcc(s, t){ let n = 0, p = 0; while ((p = s.indexOf(t, p)) >= 0){ n++; p += t.length; } return n; }
+function plain(s){
+  return s.replace(/```/g,'').replace(/!\[[^\]]*\]\([^)]*\)/g,'').replace(/\[(.*?)\]\([^)]*\)/g,'$1')
+    .replace(/[#*`_>|]/g,'').replace(/\s+/g,' ').trim();
+}
+function markTerms(html, terms){
+  let out = esc(html);
+  terms.forEach(t => {
+    const re = new RegExp('(' + t.replace(/[.*+?^${}()|[\]\\]/g,'\\$&') + ')','ig');
+    out = out.replace(re, '<b>$1</b>');
+  });
+  return out;
+}
+function snippetFor(text, terms){
+  const low = text.toLowerCase();
+  let at = -1, hitTerm = '';
+  for (const t of terms){
+    const p = low.indexOf(t);
+    if (p >= 0 && (at < 0 || p < at)){ at = p; hitTerm = t; }
+  }
+  if (at < 0) at = 0;
+  let s = text.slice(Math.max(0, at - 30), Math.max(0, at - 30) + 110);
+  if (at > 30) s = '…' + s;
+  if (at - 30 + 110 < text.length) s += '…';
+  return markTerms(s, terms);
+}
+let PENDING_HIT = null;
+function openSearchHit(id, anchor){
+  /* 路由只认 #/lesson/NN，定位锚点单独暂存，渲染完再滚过去 */
+  PENDING_HIT = anchor || null;
+  location.hash = '#/lesson/' + id;
+  searchResults.classList.remove('show');
+  searchInput.value = '';
+  document.body.classList.remove('nav-open');
+}
+function doSearch(q){
+  q = q.trim();
+  if (!q){ searchResults.classList.remove('show'); return; }
+  const terms = q.toLowerCase().split(/\s+/).filter(Boolean).slice(0, 4);
+  if (!FT_INDEX) FT_INDEX = buildSearchIndex();
+  /* 词频加权：越少见的词，命中权重越高（避免“DDR”这类高频词淹没“眼图”） */
+  const df = {};
+  for (const t of terms){
+    let c = 0;
+    for (const s of FT_INDEX){ if (s.headLow.indexOf(t) >= 0 || s.low.indexOf(t) >= 0) c++; }
+    df[t] = c;
+  }
+  const hits = [];
+  for (const sec of FT_INDEX){
+    let score = 0, ok = true, headHits = 0;
+    for (const t of terms){
+      const w = Math.log((FT_INDEX.length + 1) / (df[t] + 1)) + 1;
+      const h = sec.headLow.indexOf(t) >= 0;
+      const n = countOcc(sec.low, t);
+      if (!h && !n){ ok = false; break; }
+      if (h){ score += 90 * w; headHits++; }
+      else score += (8 + 2 * Math.min(n - 1, 4)) * w;
+    }
+    if (!ok) continue;
+    if (headHits === terms.length) score += 60;
+    if (sec.headLow.indexOf(terms.join(' ')) >= 0) score += 40;
+    score += (7 - Math.min(sec.level, 6)) * 4;
+    hits.push({ sec, score });
+  }
+  hits.sort((a, b) => b.score - a.score);
+  const top = hits.slice(0, 24);
+  if (!top.length){
+    searchResults.innerHTML = '<div class="sr-empty">没有找到包含「' + esc(q) + '」的内容；多个关键词用空格分隔</div>';
+    searchResults.classList.add('show');
+    return;
+  }
+  searchResults.innerHTML =
+    '<div class="sr-count">命中 ' + hits.length + ' 处小节' + (hits.length > top.length ? '（显示前 ' + top.length + ' 条）' : '') + '</div>' +
+    top.map(h => {
+      const s = h.sec;
+      return '<div class="sr-item" data-id="' + s.lesson.id + '" data-anchor="' + s.anchor + '">' +
+        '<div class="t">' + s.lesson.id + ' · ' + esc(s.lesson.short) + '</div>' +
+        '<div class="s">' + snippetFor(plain(s.body), terms) + '</div>' +
+        '<div class="loc">§ ' + markTerms(s.head, terms) + '</div></div>';
+    }).join('');
   searchResults.classList.add('show');
   searchResults.querySelectorAll('.sr-item').forEach(el =>
     el.addEventListener('mousedown', e => {
       e.preventDefault();
-      location.hash = '#/lesson/' + el.dataset.id;
-      searchResults.classList.remove('show');
-      searchInput.value = '';
-      document.body.classList.remove('nav-open');
+      openSearchHit(el.dataset.id, el.dataset.anchor);
     }));
 }
-searchInput.addEventListener('input', () => doSearch(searchInput.value));
-searchInput.addEventListener('keydown', e => { if (e.key === 'Escape'){ searchResults.classList.remove('show'); searchInput.blur(); } });
+let searchTimer = null;
+searchInput.addEventListener('input', () => {
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(() => doSearch(searchInput.value), 60);
+});
+searchInput.addEventListener('keydown', e => {
+  if (e.key === 'Escape'){ searchResults.classList.remove('show'); searchInput.blur(); }
+  if (e.key === 'Enter'){
+    const first = searchResults.querySelector('.sr-item');
+    if (first){ e.preventDefault(); openSearchHit(first.dataset.id, first.dataset.anchor); }
+  }
+});
 searchInput.addEventListener('blur', () => setTimeout(() => searchResults.classList.remove('show'), 150));
+/* 空闲时先建好索引，第一次输入就不用等 */
+setTimeout(() => { if (!FT_INDEX){ try { FT_INDEX = buildSearchIndex(); } catch (_) {} } }, 1500);
 
 /* ================= router & init ================= */
 let lastHash = null;
@@ -1212,6 +1328,11 @@ $('#resetBtn').addEventListener('click', () => {
 renderSidebar(null);
 document.querySelector('.brand .sub').textContent = '从零基础到就业 · ' + STAGES.length + ' 阶段 ' + LESSONS.length + ' 课';
 route();
+/* 支持 ?q=关键词 直接打开检索结果（可分享/可书签） */
+try {
+  const q0 = new URLSearchParams(location.search).get('q');
+  if (q0){ searchInput.value = q0; doSearch(q0); }
+} catch (_) {}
 </script>
 </body>
 </html>
