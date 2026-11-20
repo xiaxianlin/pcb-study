@@ -258,6 +258,9 @@ svg.routemap{width:100%;min-width:640px;height:auto;display:block}
 .md h5{font-size:15px;margin:22px 0 8px;color:var(--text);font-weight:700}
 .md p{margin:12px 0}
 .md strong{color:var(--strong)}
+.md .katex{font-size:1.03em;line-height:1.2}
+.md .katex-display{margin:.55em 0;padding:2px 0;overflow-x:auto;overflow-y:hidden;text-align:center}
+.md .katex-display>.katex{font-size:1.08em}
 .md code{font-family:var(--mono);font-size:.88em;background:var(--panel2);
   border:1px solid var(--line);border-radius:5px;padding:1px 6px;color:var(--gold)}
 .md pre{background:var(--code-bg);border:1px solid var(--line);border-radius:10px;padding:16px 18px;
@@ -356,6 +359,7 @@ details.readme .inner{padding:4px 26px 26px}
 }
 .circuit-figure{margin:1.2em 0;padding:12px;border:1px solid var(--border);border-radius:10px;overflow:hidden}.circuit-figure figcaption{font-size:.9em;line-height:1.5;margin-bottom:8px}.circuit-figure iframe{display:block;width:100%;height:390px;border:0;background:#fff;border-radius:6px}
 </style>
+<link rel="stylesheet" href="./assets/katex/katex.min.css">
 </head>
 <body>
 <div class="app">
@@ -408,6 +412,7 @@ details.readme .inner{padding:4px 26px 26px}
 
 <script id="course-data" type="application/json">__COURSE_DATA_JSON__</script>
 <script src="./assets/mermaid.min.js"></script>
+<script src="./assets/katex/katex.min.js"></script>
 <script>
 'use strict';
 /* ================= data & state ================= */
@@ -518,8 +523,23 @@ const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>
 const stars = n => '⭐'.repeat(n) + '☆'.repeat(Math.max(0, 5 - n));
 
 /* ================= markdown renderer ================= */
+function katexHTML(src, display){
+  try {
+    if (!window.katex) throw new Error('katex missing');
+    return katex.renderToString(src, { displayMode: !!display, throwOnError: false, strict: false });
+  } catch (e){
+    return '<code>' + esc(src) + '</code>';
+  }
+}
 function inline(s){
+  /* 数学段先切出来占位，避免被后面的代码/加粗规则改坏 */
+  const mats = [];
+  s = String(s).replace(/\$\$([^$]+)\$\$|\$([^$\n]+)\$|\\\(([^)]*)\\\)/g, (m, d, i, p) => {
+    mats.push(d !== undefined ? katexHTML(d, true) : (i !== undefined ? katexHTML(i, false) : katexHTML(p, false)));
+    return '\u0001M' + (mats.length - 1) + '\u0001';
+  });
   s = esc(s);
+  s = s.replace(/\u0001M(\d+)\u0001/g, (m, n) => mats[+n]);
   s = s.replace(/`([^`]+)`/g, (m,c) => '<code>'+c+'</code>');
   s = s.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
   s = s.replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, (m,t,u) =>
@@ -558,6 +578,21 @@ function mdToHtml(md, opts){
       } else {
         out += '<pre><code>' + esc(buf.join('\n')) + '</code></pre>';
       }
+      continue;
+    }
+    /* 独立数学块 $$ ... $$（可跨行，收尾 $$ 可在行末） */
+    if (/^\s*\$\$/.test(line)){
+      let buf = [], cur = line.replace(/^\s*\$\$/, '');
+      for (;;){
+        const endIdx = cur.indexOf('$$');
+        if (endIdx >= 0){ buf.push(cur.slice(0, endIdx)); break; }
+        buf.push(cur);
+        i++;
+        if (i >= lines.length) break;
+        cur = lines[i];
+      }
+      i++;
+      out += '<div class="math-block">' + katexHTML(buf.join('\n').trim(), true) + '</div>';
       continue;
     }
     /* details / summary 折叠块透传 */
