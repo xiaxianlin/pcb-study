@@ -22,9 +22,8 @@ STAGE_BY_ID = {k: i for i, ids in enumerate((
     '24 25 26 27 28 29 30',
     '31 32 33 34 35',
 ), 1) for k in ids.split()}
-# 重构后的章节放在 phase*-new/ 下，同编号文件优先于根目录旧章节。
-# 这样每写完一章就能在本地站点预览，不必等整阶段替换完。
-PHASE_DIRS = [COURSE_DIR / f'phase{n}-new' for n in range(1, 6)]
+# 35 章按阶段放在 chapters/phase1..phase5/ 下；旧版 26 章移到 archive/ 不再参与构建。
+PHASE_DIRS = [COURSE_DIR / 'chapters' / f'phase{n}' for n in range(1, 6)]
 
 
 def parse_lesson(path: pathlib.Path) -> dict:
@@ -101,10 +100,10 @@ def collect_resources():
     for folder in (exercise_dir, car_dir, led_dir, stm32_dir, sim_review_dir):
         if folder.exists():
             paths.extend(sorted(folder.rglob('*.md')))
-    exercise_file = COURSE_DIR / '基础练习与实验记录手册.md'
+    exercise_file = COURSE_DIR / 'docs' / '基础练习与实验记录手册.md'
     if exercise_file.is_file():
         paths.append(exercise_file)
-    analog_file = COURSE_DIR / '模拟电路进阶练习.md'
+    analog_file = COURSE_DIR / 'docs' / '模拟电路进阶练习.md'
     if analog_file.is_file():
         paths.append(analog_file)
     mapping_file = COURSE_DIR / '课件内容与课程对照核验表-2026-11-02.md'
@@ -133,7 +132,7 @@ def collect_resources():
                 # 站内专题独立页面暂不支持跨页标题锚点，仍保留到目标文档入口。
                 return '[' + match.group(1) + '](#/resource/' + id_by_path[resolved] + ')'
             lesson = re.match(r'^(\d{2})-.*\.md$', resolved.name)
-            if resolved.parent == COURSE_DIR and lesson and lesson.group(1) in ORDER:
+            if lesson and lesson.group(1) in ORDER:
                 return '[' + match.group(1) + '](#/lesson/' + lesson.group(1) + ')'
             # 未打包的本地路径无法在单文件站点访问，避免生成失效链接。
             return match.group(1) + '（本地项目资料，站点未打包）'
@@ -150,7 +149,7 @@ def collect_resources():
 
 def collect_lesson_files():
     """收集课程文件；phase*-new/ 中同编号文件覆盖根目录旧版。"""
-    by_id = {path.name[:2]: path for path in sorted(COURSE_DIR.glob('[0-9][0-9]-*.md'))}
+    by_id = {}
     for phase_dir in PHASE_DIRS:
         if phase_dir.is_dir():
             for path in sorted(phase_dir.glob('[0-9][0-9]-*.md')):
@@ -178,7 +177,8 @@ def main():
         table = '\n'.join(line for line in mapping.splitlines() if line.startswith('|'))
         readme = readme.replace('[课程编号对照与整合记录](课程编号对照与整合记录-2026-10-29.md)', '下方的课程编号对照表')
         readme += '\n\n## 课程编号对照表\n\n' + table + '\n'
-    readme = re.sub(r'\]\((\d{2})-[^)]*\.md\)', r'](#/lesson/\1)', readme)
+    readme = re.sub(r'\]\((?:chapters/phase[1-5]/)?(\d{2})-[^)]*\.md\)', r'](#/lesson/\1)', readme)
+    readme = re.sub(r'\]\(docs/([^)]*)\.md\)', lambda m: '](docs/' + m.group(1) + '.md)', readme)
     readme = re.sub(r'\]\(sim:([A-Za-z0-9_-]+)\)', r'](#/sim/\1)', readme)
     for path, resource_id in resource_paths.items():
         readme = readme.replace('](' + path + ')', '](#/resource/' + resource_id + ')')
